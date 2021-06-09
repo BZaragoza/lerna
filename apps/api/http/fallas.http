@@ -1,0 +1,27 @@
+### Fetch all clients
+GET http://localhost:8080/fallas
+
+### Fetch only one client
+GET http://localhost:8080/fallas/5
+
+### Create a new client
+POST http://localhost:8080/modelos
+Content-Type: application/json
+
+{
+    "falla_id": 57,
+    "modelo": "Pixel 3 XL",
+    "modelo_num": "Si"
+}
+
+###
+PUT http://localhost:8080/fallas/4
+Content-Type: application/json
+
+{
+    "falla": "Bocina",
+    "solucion": "Bocina"
+}
+
+###
+DELETE http://localhost:8080/fallas/9

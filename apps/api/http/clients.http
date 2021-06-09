@@ -1,0 +1,31 @@
+### Fetch all clients
+GET http://localhost:3000/clientes
+
+### Fetch only one client
+GET http://localhost:3000/clientes/2
+
+### Create a new client
+POST http://localhost:3000/clientes
+Content-Type: application/json
+
+{
+    "nombre": "Juan",
+    "apellido_paterno": "Camaney",
+    "apellido_materno": null,
+    "telefono1": "6141234567",
+    "telefono2": null,
+    "notas": null
+}
+
+###
+PUT http://localhost:3000/clientes/37
+Content-Type: application/json
+
+{
+    "nombre": "Juan Camaney",
+    "num_telefono": "6141234567",
+    "activo": 0
+}
+
+###
+DELETE http://localhost:3000/clientes/37

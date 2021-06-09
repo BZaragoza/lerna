@@ -1,0 +1,25 @@
+### Fetch all clients
+GET http://localhost:3000/chip
+
+### Fetch only one client
+GET http://localhost:3000/chip/1
+
+### Create a new client
+POST http://localhost:3000/chip
+Content-Type: application/json
+
+{
+    "compañia": "No"
+}
+
+###
+PUT http://localhost:3000/chip/1
+Content-Type: application/json
+
+{
+    "nombre": "Brian Zaragoza",
+    "num_telefono": "6141735464"
+}
+
+###
+DELETE http://localhost:3000/chip/14

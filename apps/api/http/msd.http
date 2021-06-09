@@ -1,0 +1,25 @@
+### Fetch all clients
+GET http://localhost:3000/msd
+
+### Fetch only one client
+GET http://localhost:3000/msd/1
+
+### Create a new client
+POST http://localhost:3000/msd
+Content-Type: application/json
+
+{
+    "capacidad": 0
+}
+
+###
+PUT http://localhost:3000/msd/1
+Content-Type: application/json
+
+{
+    "nombre": "Brian Zaragoza",
+    "num_telefono": "6141735464"
+}
+
+###
+DELETE http://localhost:3000/msd/14

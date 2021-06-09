@@ -1,0 +1,25 @@
+GET http://localhost:8080/soluciones
+
+### Fetch only one client
+GET http://localhost:8080/soluciones/24
+
+### Create a new client
+POST http://localhost:8080/soluciones
+Content-Type: application/json
+
+{
+    "nombre": "FRP",
+    "descripcion": "Equipo bloqueado con cuenta de Google"
+}
+
+###
+PUT http://localhost:8080/soluciones/4
+Content-Type: application/json
+
+{
+    "falla": "Bocina",
+    "solucion": "Bocina"
+}
+
+###
+DELETE http://localhost:8080/soluciones/9
