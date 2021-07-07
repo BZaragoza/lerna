@@ -19,7 +19,6 @@ export default function CardOrdersDropdown ({ order, id, fetchOrders}) {
 
   return (
     <>
-      
       <div 
         className="text-gray-600 py-1 px-3"
         ref={btnDropdownRef}
@@ -33,8 +32,8 @@ export default function CardOrdersDropdown ({ order, id, fetchOrders}) {
       <div
         ref={popoverDropdownRef}
         className={
-          (dropdownPopoverShow ? "block " : "hidden ") +
-          "bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
+          (dropdownPopoverShow ? "block" : "hidden") + 
+          " bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
         }
       >
         <Link to={`/admin/order-new/${id}`} >
@@ -42,7 +41,7 @@ export default function CardOrdersDropdown ({ order, id, fetchOrders}) {
             Editar
           </p>
         </Link>
-        <Link>
+        <Link to="/admin/orders">
           <p className= "text-sm py-2 px-4 font-normal block w-full whitespace-no-wrap bg-transparent text-gray-800"
           onClick={(e) => e.preventDefault()}
           >

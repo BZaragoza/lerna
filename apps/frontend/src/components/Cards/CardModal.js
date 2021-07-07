@@ -1,13 +1,14 @@
 import React from "react";
+import { DateTime } from 'luxon';
 
 export default function Modal({ showModal, setShowModal, order }) {
 
   return (
     <>
-      { showModal ? (
+      {showModal ? (
         <>
           <div
-            className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+            className="justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
             onClick={() => setShowModal(false)}
           >
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
@@ -15,12 +16,9 @@ export default function Modal({ showModal, setShowModal, order }) {
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
-                  <h3 className="text-3xl font-semibold">
+                  <p className="text-3xl font-semibold">
                     Orden de Servicio
-                  </h3>
-                  <h3 className="text-3xl font-semibold ">
-                    <strong>Folio:</strong> { order?.folio }
-                  </h3>
+                  </p>
                   <button
                     className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
@@ -33,84 +31,91 @@ export default function Modal({ showModal, setShowModal, order }) {
                 {/*body*/}
                 <div className="container px-4 mx-auto">
                   <div className="flex flex-wrap">
+
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Fecha Entrada:</strong> { order?.receptionDate.replace("T", " ").substring(0, 16) }
+                        <strong>Folio:</strong> { order?.folio }
+                      </p>
+                    </div>
+
+                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
+                        <strong>Fecha Entrada:</strong> {DateTime.fromMillis(order?.receptionDate).toLocaleString(DateTime.DATETIME_MED)}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Fecha Entregado:</strong> { order?.deadlineDate.replace("T", " ").substring(0, 16) }
+                        <strong>Fecha Entregado:</strong> {DateTime.fromMillis(order?.deadlineDate).toLocaleString(DateTime.DATETIME_MED)}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-12/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Cliente:</strong> { `${order?.nombre} ${order?.apellido_paterno} ${order?.apellido_materno}`.toUpperCase() }
-                      </p>                      
+                        <strong>Cliente:</strong> {`${order?.nombre} ${order?.apellido_paterno || ""} ${order?.apellido_materno || ""}`.toUpperCase()}
+                      </p>
                     </div>
                     <div className="w-full px-4 md:w-12/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Status:</strong> { `${order.status}`.toUpperCase() }
-                      </p>                     
-                    </div>
-                    <div className="w-full px-4 md:w-6/12 md:flex-none">
-                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Telefono 1:</strong> { order?.telefono1 }
+                        <strong>Status:</strong> {`${order.status}`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Telefono 2:</strong> { order?.telefono2 }
-                        </p>
+                        <strong>Telefono 1:</strong> {order?.telefono1}
+                      </p>
+                    </div>
+                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
+                        <strong>Telefono 2:</strong> {order?.telefono2}
+                      </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
                         <strong>Equipo:</strong> {`${order?.marca} ${order?.modelo}`.toUpperCase()}
-                        </p>
-                    </div>
-                    <div className="w-full px-4 md:w-4/12 md:flex-none">
-                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Dejo:</strong> { order?.dejo ? "SI" : "NO" }
-                        </p>
-                    </div>
-                    <div className="w-full px-4 md:w-4/12 md:flex-none">
-                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Pin o Patron 1:</strong> { `${order?.pin1 }`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Pin o Patron 2:</strong> { `${order?.pin2 }`.toUpperCase()}
+                        <strong>Dejo:</strong> {order?.dejo ? "SI" : "NO"}
                       </p>
                     </div>
-                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                    <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Falla:</strong> { `${order.falla}`.toUpperCase() }
+                        <strong>Pin o Patron 1:</strong> {`${order?.pin1}`.toUpperCase()}
+                      </p>
+                    </div>
+                    <div className="w-full px-4 md:w-4/12 md:flex-none">
+                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
+                        <strong>Pin o Patron 2:</strong> {`${order?.pin2}`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>A Realizar:</strong> { `${order.solucion}`.toUpperCase() }
+                        <strong>Falla:</strong> {`${order.falla}`.toUpperCase()}
+                      </p>
+                    </div>
+                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                      <p className="my-4 text-gray-600 text-lg leading-relaxed">
+                        <strong>A Realizar:</strong> {`${order.solucion}`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Bateria:</strong> { order?.battery ? "SI" : "NO" }
+                        <strong>Bateria:</strong> {order?.battery ? "SI" : "NO"}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Chip:</strong> { `${order?.compañia}`.toUpperCase() }
+                        <strong>Chip:</strong> {`${order?.compañia}`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>MSD:</strong> { order?.capacidad === 0 ? 'NO' : `${order?.capacidad} GB`.toUpperCase()}
+                        <strong>MSD:</strong> {order?.capacidad === 0 ? 'NO' : `${order?.capacidad} GB`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Cargador:</strong> { order?.charger ? "SI" : "NO" }
+                        <strong>Cargador:</strong> {order?.charger ? "SI" : "NO"}
                       </p>
                     </div>
                   </div>
@@ -120,22 +125,22 @@ export default function Modal({ showModal, setShowModal, order }) {
                   <div className="flex flex-wrap">
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Precio:</strong> { `$ ${order?.price}` }
+                        <strong>Precio:</strong> {`$ ${order?.price}`}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Abono:</strong> { `$ ${order?.anticipo}` }
+                        <strong>Abono:</strong> {`$ ${order?.anticipo}`}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Resta:</strong> { `$ ${order?.remain}` }
+                        <strong>Resta:</strong> {`$ ${order?.remain}`}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Notas:</strong> { `${order?.notes}`.toUpperCase() }
+                        <strong>Notas:</strong> {`${order?.notes}`.toUpperCase()}
                       </p>
                     </div>
                     <div className="w-full px-4 md:w-6/12 md:flex-none">
@@ -145,7 +150,7 @@ export default function Modal({ showModal, setShowModal, order }) {
                     </div>
                     <div className="w-full px-4 md:w-12/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Notas del Tecnico:</strong> 
+                        <strong>Notas del Tecnico:</strong>
                       </p>
                     </div>
                   </div>

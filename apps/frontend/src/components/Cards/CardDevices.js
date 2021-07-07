@@ -1,29 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import PropTypes from "prop-types";
 
-// components
+import CardEditDeleteDropdown from 'components/Dropdowns/CardEditDeleteDropdown';
 
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
-import { useFetch } from "hooks/useFetch";
+const Devices = ({ color = 'light' }) => {
 
-export default function CardSolutions({ color }) {
+  const [devices, setDevices] = useState([])
 
-  // const [solutions, setSolutions] = useState([]);
 
-  // useEffect(() => {
-  //   fetchSolutions()
-  // }, [])
+  useEffect(() => {
+    fetchDevices()
+  }, [])
 
-  // const fetchSolutions = () => {
-  //   fetch("/soluciones")
-  //     .then(res => res.json())
-  //     .then(({ res }) => {
-  //       setSolutions(res)
-  //     })
-  // }
-
-  const[ solutions, setSolutions, loading ] = useFetch("/soluciones");
+  const fetchDevices = () => {
+    fetch("/devices")
+      .then(res => res.json())
+      .then(({ res }) => setDevices(res))
+  }
 
   return (
     <>
@@ -43,16 +36,14 @@ export default function CardSolutions({ color }) {
                     (color === "light" ? "text-gray-800" : "text-white")
                   }
                 >
-                  Soluciones
+                  Equipos
               </h3>
-                <Link to="/admin/solution-new">
-                  <button
-                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    Nueva Solucion
-                  </button>
-                </Link>
+                <button
+                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                  type="button"
+                >
+                  <Link to="/admin/device-new">Nuevo Equipo</Link>
+                </button>
               </div>
             </div>
           </div>
@@ -70,7 +61,7 @@ export default function CardSolutions({ color }) {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Falla
+                  ID
                 </th>
                 <th
                   className={
@@ -80,17 +71,7 @@ export default function CardSolutions({ color }) {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Solucion
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Descripcion
+                  Equipo
                 </th>
                 <th
                   className={
@@ -105,26 +86,25 @@ export default function CardSolutions({ color }) {
               </tr>
             </thead>
             <tbody>
+
               {
-                !loading && solutions?.map( ({ id, falla, solucion, descripcion}) => {
+                devices.map( ({ id, device }) => {
                   return (
                     <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { falla }
+                        { id }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { solucion }
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        { descripcion }
+                        { device }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="solution-new" id={ id } fetchAgain={ setSolutions } table={"soluciones"}/>
+                        <CardEditDeleteDropdown id={ id } table="devices" fetchFunction={ fetchDevices }/>
                       </td>
                     </tr>
                   )
                 })
               }
+
             </tbody>
           </table>
         </div>
@@ -133,10 +113,4 @@ export default function CardSolutions({ color }) {
   );
 }
 
-CardSolutions.defaultProps = {
-  color: "light",
-};
-
-CardSolutions.propTypes = {
-  color: PropTypes.oneOf(["light", "dark"]),
-};
+export default Devices

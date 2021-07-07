@@ -1,24 +1,32 @@
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
+import React from 'react';
 import { Link } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
 
 import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
+import { useFetch } from "hooks/useFetch";
 
 export default function CardFaults({ color }) {
 
-  const [faults, setFaults] = useState([]);
+  const[ faults, setFaults, loading ] = useFetch("/fallas");
 
-  useEffect(() => {
-    fetchFaults();
-  }, []);
+  // console.log( loading )
 
-  const fetchFaults = () => {
-    fetch("/fallas")
-      .then(res => res.json())
-      .then(({ res }) => setFaults(res))
-  }
+  // console.log(faults)
+
+  // const [faults, setFaults] = useState([]);
+
+  // useEffect(() => {
+  //   fetchFaults();
+  // }, []);
+
+  // const fetchFaults = () => {
+  //   fetch("/fallas")
+  //     .then(res => res.json())
+  //     .then(({ res }) => setFaults(res))
+  // }
 
 
   return (
@@ -92,6 +100,7 @@ export default function CardFaults({ color }) {
             </thead>
             <tbody>
               {
+                !loading && 
                 faults?.map( ({ id, falla, descripcion }) => {
                   return (
                     <tr key={ id }>
@@ -102,7 +111,7 @@ export default function CardFaults({ color }) {
                         { descripcion }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="fault-new" id={ id } fetchAgain={fetchFaults} table={"fallas"}/>
+                        <CardBrandsModelsDropdown path="fault-new" id={ id } setState={ setFaults } table={"fallas"}/>
                       </td>
                     </tr>
                   )

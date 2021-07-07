@@ -2,7 +2,8 @@ import React from "react";
 import { createPopper } from "@popperjs/core";
 import { Link } from "react-router-dom";
 
-export default function CardDropdown ({ path, id, fetchAgain, table }) {
+export default function CardDropdown ({ path , id, setState, table }) {
+
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef();
@@ -13,6 +14,7 @@ export default function CardDropdown ({ path, id, fetchAgain, table }) {
     });
     setDropdownPopoverShow(true);
   };
+  
   const closeDropdownPopover = () => {
     setDropdownPopoverShow(false);
   };
@@ -26,8 +28,12 @@ export default function CardDropdown ({ path, id, fetchAgain, table }) {
     })
       .then( res => res.json() )
       .then( res => {
-        console.log(res) 
-        fetchAgain()
+        console.log(res)
+
+        setState( state => state.map( item => {
+          return item.id !== id
+        }))
+
       })
       .catch( err => console.log(err))
 
@@ -57,11 +63,11 @@ export default function CardDropdown ({ path, id, fetchAgain, table }) {
             Editar
           </p>
         </Link>
-        <Link>
-          <p onClick={deleteItem} className="text-sm py-2 px-4 font-normal block w-full whitespace-no-wrap bg-transparent text-gray-800">
+        <div>
+          <p onClick={ deleteItem } className="text-sm py-2 px-4 font-normal block w-full whitespace-no-wrap bg-transparent text-gray-800">
             Eliminar
           </p>
-        </Link>
+        </div>
       </div>
     </>
   );

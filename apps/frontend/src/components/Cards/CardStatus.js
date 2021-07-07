@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom'
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom';
 
-// components
+import CardEditDeleteDropdown from '../Dropdowns/CardEditDeleteDropdown'
 
-import CardClientDropdown from "components/Dropdowns/CardClientDropdown.js";
 
-export default function CardClients({ color = 'light' }) {
+const CardStatus = ({ color = 'light' }) => {
 
-  const [clients, setClients] = useState([]);
-  
+  const [statuses, setStatuses] = useState([])
+
 
   useEffect(() => {
-    fetchClients()
+    fetchStatus()
   }, [])
 
-  const fetchClients = () => {
-    fetch("/clientes")
+  const fetchStatus = () => {
+    fetch("/status")
       .then(res => res.json())
-      .then(({ res }) => setClients(res))
+      .then(({ res }) => setStatuses(res))
   }
-
 
   return (
     <>
@@ -40,13 +37,13 @@ export default function CardClients({ color = 'light' }) {
                     (color === "light" ? "text-gray-800" : "text-white")
                   }
                 >
-                  Clientes
+                  Estados
               </h3>
                 <button
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                   type="button"
                 >
-                  <Link to="/admin/client-new">Nuevo Cliente</Link>
+                  <Link to="/admin/status-new">Nuevo Estado</Link>
                 </button>
               </div>
             </div>
@@ -75,7 +72,7 @@ export default function CardClients({ color = 'light' }) {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Nombre
+                  Estado
                 </th>
                 <th
                   className={
@@ -85,47 +82,7 @@ export default function CardClients({ color = 'light' }) {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Apellido Paterno
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Apellido Materno
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Teléfono 1
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Teléfono 2
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Notas
+                  Color 
                 </th>
                 <th
                   className={
@@ -142,32 +99,24 @@ export default function CardClients({ color = 'light' }) {
             <tbody>
 
               {
-                clients.map( client => {
+                statuses.map( status => {
                   return (
-                    <tr key={client.id}>
+                    <tr key={status.id}>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.id}
+                        {status.id}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.nombre}
+                        {status.status}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {client.apellido_paterno}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.apellido_materno}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.telefono1}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.telefono2}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.notas}
+                        <div className={status.color}  style={{
+                          width:'50px',
+                          height:'20px',
+                          // border:'1px solid #ccc',
+                        }}></div>
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardClientDropdown id={client.id} table="clientes" fetchClients={ fetchClients }/>
+                        <CardEditDeleteDropdown id={status.id} table="status" fetchFunction={ fetchStatus }/>
                       </td>
                     </tr>
                   )
@@ -182,6 +131,4 @@ export default function CardClients({ color = 'light' }) {
   );
 }
 
-CardClients.propTypes = {
-  color: PropTypes.oneOf(["light", "dark"]),
-};
+export default CardStatus

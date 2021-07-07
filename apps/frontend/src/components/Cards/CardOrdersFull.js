@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { DateTime } from 'luxon';
+import { toast } from 'react-toastify'; 
 
 // components
 
 import CardOrdersDropdown from "components/Dropdowns/CardOrdersDropdown.js";
-import { getBackColor } from "utils/utils";
 
 export default function CardOrdersFull({ color }) {
 
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetchOrders()
+    let isMounted = true
+    if ( isMounted ) fetchOrders()
+
+    return () => { isMounted = false }
   }, []);
 
   const fetchOrders = () => {
@@ -40,7 +44,7 @@ export default function CardOrdersFull({ color }) {
                   }
                 >
                   Ordenes de Servicio
-              </h3>
+                </h3>
                 <Link to="/admin/order-new">
                   <button
                     className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
@@ -117,6 +121,16 @@ export default function CardOrdersFull({ color }) {
                   }
                 >
                   Telefono 2
+                </th>
+                <th
+                  className={
+                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
+                    (color === "light"
+                      ? "bg-gray-100 text-gray-600 border-gray-200"
+                      : "bg-blue-800 text-blue-300 border-blue-700")
+                  }
+                >
+                  Dispositivo
                 </th>
                 <th
                   className={
@@ -314,28 +328,43 @@ export default function CardOrdersFull({ color }) {
               {
                 orders.map(order => {
                   let {
-                    id, receptionDate, folio, nombre, apellido_paterno, apellido_materno, telefono1, 
+                    id, receptionDate, folio, nombre, apellido_paterno, apellido_materno, telefono1,
                     telefono2, marca, modelo, dejo, falla, solucion, battery, compañia, capacidad,
-                    charger, price, anticipo, remain, deadlineDate, pin1, pin2, notes, status
+                    charger, price, anticipo, remain, deadlineDate, pin1, pin2, notes, status, color, device
                   } = order;
-                  receptionDate = new Date(Date.parse(receptionDate) - 25200000).toISOString().substring(0, 16).replace("T", " ")
-                  deadlineDate = new Date(Date.parse(deadlineDate) - 25200000).toISOString().substring(0, 16).replace("T", " ")
-                  
-                   return (
-                    <tr key={id}>
+                   
+                  return (
+                    <tr onClick={ () => toast.success('Have fun storming the castle!', 'Miracle Max Says') }  key={id}>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { receptionDate.replace("T", " ").substring(0, 16) }
+                        {DateTime.fromMillis(receptionDate).toLocaleString(DateTime.DATETIME_MED)}
+                        {/* { DateTime.now().toLocaleString(DateTime.DATETIME_MED) } */}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        <span className={getBackColor(status) + "text-xs font-semibold inline-block py-1 px-2 uppercase rounded  uppercase last:mr-0 mr-1"}>
-                        <p>{ folio }</p>
-                      </span>
+                        <p>{folio}</p>
                       </td>
+                      
+                      
+                      
+                      
+                      {/* 
+                      
+                        ToDo: Estado clickeable
+                        
+                      */}
+                      
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${status || ""}`.toUpperCase() }
+                        <span className={ color + " text-xs font-semibold inline-block py-1 px-2 uppercase rounded  uppercase last:mr-0 mr-1"}>
+                        {`${status || ""}`.toUpperCase()}
+                        </span>
                       </td>
+
+
+
+
+
+
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase() }
+                        {`${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         {telefono1}
@@ -344,54 +373,57 @@ export default function CardOrdersFull({ color }) {
                         {telefono2}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                        { device.toUpperCase() }
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         {`${marca} ${modelo}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { dejo ? "SI" : "NO" }
+                        {dejo ? "SI" : "NO"}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${falla}`.toUpperCase() }
+                        {`${falla}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${solucion}`.toUpperCase() }
+                        {`${solucion}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { battery ? "SI" : "NO" }
+                        {battery ? "SI" : "NO"}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${compañia}`.toUpperCase() }
+                        {`${compañia}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { capacidad === 0 ? 'NO' : `${capacidad} GB`.toUpperCase()}
+                        {capacidad === 0 ? 'NO' : `${capacidad} GB`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { charger ? "SI" : "NO" }
+                        {charger ? "SI" : "NO"}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `$ ${price}` }
+                        {`$ ${price}`}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `$ ${anticipo}` }
+                        {`$ ${anticipo}`}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `$ ${remain}` }
+                        {`$ ${remain}`}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { deadlineDate.replace("T", " ").substring(0, 16) }
+                        {DateTime.fromMillis(deadlineDate).toLocaleString(DateTime.DATETIME_MED)}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${pin1}`.toUpperCase() }
+                        {`${pin1}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { pin2 ? `${pin2}`.toUpperCase() : "" }
+                        {pin2 ? `${pin2}`.toUpperCase() : ""}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { `${notes}`.toUpperCase() }
+                        {`${notes}`.toUpperCase()}
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         {
-                          status==="Entregado" 
-                            ? <span role="img" aria-label="Entregado">&#10004;</span> 
+                          status === "Entregado"
+                            ? <span role="img" aria-label="Entregado">&#10004;</span>
                             : <span role="img" aria-label="Sin entregar">&#10060;</span>
                         }
                       </td>

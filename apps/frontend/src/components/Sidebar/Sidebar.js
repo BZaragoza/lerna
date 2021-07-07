@@ -7,6 +7,7 @@ import UserDropdown from "components/Dropdowns/UserDropdown.js";
 
 export default function Sidebar() {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
+
   return (
     <>
       <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-no-wrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
@@ -193,6 +194,7 @@ export default function Sidebar() {
                   Nuevo Cliente
                 </Link>
               </li>
+
               <li className="items-center">
                 <Link
                   className={
@@ -258,6 +260,8 @@ export default function Sidebar() {
                   Nuevo Modelo
                 </Link>
               </li>
+              
+              
               <li className="items-center">
                 <Link
                   className={
@@ -323,6 +327,7 @@ export default function Sidebar() {
                   Nueva Solucion
                 </Link>
               </li>
+              
               <li className="items-center">
                 <Link
                   className={
@@ -388,7 +393,99 @@ export default function Sidebar() {
                   Nueva MSD
                 </Link>
               </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (window.location.href.indexOf("/admin/statuses") !== -1
+                      ? "text-blue-500 hover:text-blue-600"
+                      : "text-gray-800 hover:text-gray-600")
+                  }
+                  to="/admin/statuses"
+                >
+                  <i
+                    className={
+                      "fas fa-exclamation-circle mr-2 text-sm " +
+                      (window.location.href.indexOf("/admin/statuses") !== -1
+                        ? "opacity-75"
+                        : "text-gray-400")
+                    }
+                  ></i>{" "}
+                  Estados
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (window.location.href.indexOf("/admin/status-new") !== -1
+                      ? "text-blue-500 hover:text-blue-600"
+                      : "text-gray-800 hover:text-gray-600")
+                  }
+                  to="/admin/status-new"
+                >
+                  <i
+                    className={
+                      "far fa-plus-square mr-2 text-sm " +
+                      (window.location.href.indexOf("/admin/status-new") !== -1
+                        ? "opacity-75"
+                        : "text-gray-400")
+                    }
+                  ></i>{" "}
+                  Nuevo Estado
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (window.location.href.indexOf("/admin/devices") !== -1
+                      ? "text-blue-500 hover:text-blue-600"
+                      : "text-gray-800 hover:text-gray-600")
+                  }
+                  to="/admin/devices"
+                >
+                  <i
+                    className={
+                      "fas fa-exclamation-circle mr-2 text-sm " +
+                      (window.location.href.indexOf("/admin/devices") !== -1
+                        ? "opacity-75"
+                        : "text-gray-400")
+                    }
+                  ></i>{" "}
+                  Equipos
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (window.location.href.indexOf("/admin/devices-new") !== -1
+                      ? "text-blue-500 hover:text-blue-600"
+                      : "text-gray-800 hover:text-gray-600")
+                  }
+                  to="/admin/devices-new"
+                >
+                  <i
+                    className={
+                      "far fa-plus-square mr-2 text-sm " +
+                      (window.location.href.indexOf("/admin/devices-new") !== -1
+                        ? "opacity-75"
+                        : "text-gray-400")
+                    }
+                  ></i>{" "}
+                  Nuevo Equipo
+                </Link>
+              </li>
+
             </ul>
+
+            
+              
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />

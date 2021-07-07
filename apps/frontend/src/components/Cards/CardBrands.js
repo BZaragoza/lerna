@@ -5,11 +5,11 @@ import PropTypes from "prop-types";
 
 import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
 import { Link } from "react-router-dom";
+// import { useFetch } from "hooks/useFetch";
 
 export default function CardBrands({ color }) {
 
   const [brands, setBrands] = useState([]);
-
   useEffect(() => {
     fetchBrands()
   }, [])

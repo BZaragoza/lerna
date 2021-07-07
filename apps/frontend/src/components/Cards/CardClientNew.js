@@ -4,8 +4,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { clientSchema } from "schemas/schemas";
+import InputBoxForm from "components/Forms/InputBoxForm";
 
-export default function CardClientNew() {
+export default function CardClientNew( props ) {
+
+  console.log(props)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(clientSchema)
@@ -16,7 +19,7 @@ export default function CardClientNew() {
   const isAddMode = !id;
   
 
-  console.log(errors)
+  console.log( errors )
 
   const onSubmit = (data) => {
     return isAddMode 
@@ -79,105 +82,16 @@ export default function CardClientNew() {
           </div>
         </div>
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="nombre"
-                  >
-                    Nombre
-                    </label>
-                  <input
-                    {...register("nombre", { required: true })}
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Apellido Paterno
-                    </label>
-                  <input
-                    {...register("apellido_paterno", {required: true})}
 
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Apellido Materno
-                    </label>
-                  <input
-                    {...register("apellido_materno")}
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-3/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Telefono 1
-                    </label>
-                  <input
-                    {...register("telefono1", {required: true})}
-                    type="tel"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-3/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Telefono 2
-                    </label>
-                  <input
-                    {...register("telefono2", {minLength: 10})}
-                    type="tel"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-6/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Notas
-                    </label>
-                  <textarea
-                    {...register("notas")}
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                    rows="1"
-                  ></textarea>
-                </div>
-              </div>
+              <InputBoxForm register={ register } required label="Nombre" input="nombre" />
+              <InputBoxForm register={ register } required label="Apellido Paterno" input="apellido_paterno" />
+              <InputBoxForm register={ register } label="Apellido Materno" input="apellido_materno" />
+              <InputBoxForm register={ register } required label="Telefono 1" input="telefono1" />
+              <InputBoxForm register={ register } label="Telefono 2" input="telefono2" />
+              <InputBoxForm register={ register } large label="Notas" input="notas" />
+              
             </div>
             <div className="flex flex-wrap mt-6 justify-end">
               <button

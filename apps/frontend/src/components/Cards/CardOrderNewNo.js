@@ -1,11 +1,14 @@
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
+// import { orderSchema } from "schemas/schemas";
 
 import React, { useState, useEffect, useCallback } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
-import { useForm, Controller } from "react-hook-form";
+// import { Link, useHistory, useParams } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import DatePicker, { registerLocale } from "react-datepicker";
 import { DateTime } from 'luxon';
+// import { yupResolver } from "@hookform/resolvers/yup";
 
 const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
@@ -17,26 +20,34 @@ registerLocale("es", {
   }
 });
 
-const CardOrderNew2 = () => {
 
-  const { id } = useParams();
-  const isAddMode = !id;
+
+
+export default function CardOrderNew() {
+
 
   const defaultValues = {
-    receptionDate: DateTime.now().toJSDate(),
-    deadlineDate: DateTime.now().set({ hour: 17, minute: 0 }).plus({ days: 1 }).toJSDate(),
+    receptionDate: new Date(),
+    deadlineDate: new Date(),
     dejo: false,
     encendido: false,
     battery: false,
     charger: false,
-    status_id: null,
+    status: null,
   }
 
-
+  defaultValues.deadlineDate.setDate( defaultValues.deadlineDate.getDate() + 1 )
+  defaultValues.deadlineDate.setHours(17, 0, 0);
+  
+  // const { register, handleSubmit, setValue, getValues, watch, control, formState: { errors } } = useForm({
   const { register, handleSubmit, setValue, getValues, watch, control } = useForm({
     defaultValues,
     // resolver: yupResolver(orderSchema)
   })
+
+  // const history = useHistory();
+  const { id } = useParams();
+  const isAddMode = !id;
 
   const [msd, setMsd] = useState([]);
   const [chip, setChip] = useState([]);
@@ -46,8 +57,7 @@ const CardOrderNew2 = () => {
   const [solutions, setSolutions] = useState([]);
   const [clients, setClients] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [devices, setDevices] = useState([]);
-  // const [folio, setFolio] = useState(null)
+  const [devices, setDevices] = useState([])
 
   useEffect(() => {
 
@@ -87,29 +97,23 @@ const CardOrderNew2 = () => {
       .then(res => res.json())
       .then(({ res }) => setDevices(res))
 
-    fetch("/folio")
-      .then( res => res.json() )
-      .then( ({ folio }) => setValue("folio", folio) )
-
 
   }, [setValue]);
 
   const onSubmit = (data) => {
-    console.log(data)
     delete data.models
     delete data.solutions
     data.remain = data.price - data.anticipo
-    data.status_id = Number(data.status_id)
-
-    data.receptionDate = DateTime.fromJSDate(data.receptionDate).ts
-    data.deadlineDate = DateTime.fromJSDate(data.deadlineDate).ts
+    data.status = Number(data.status)
 
 
+    data.receptionDate = DateTime.local().toMillis();
+    data.deadlineDate = DateTime.local(data.deadlineDate).ts
 
-    // return isAddMode
-    createOrder(data)
-    // ? createOrder(data)
-    // : updateOrder(id, data)
+    console.log(data)
+    return isAddMode
+      ? createOrder(data)
+      : updateOrder(id, data)
   }
 
   const createOrder = (newOrder) => {
@@ -128,8 +132,21 @@ const CardOrderNew2 = () => {
       })
   }
 
-  const [, setUnusedState] = useState()
-  const forceUpdate = useCallback(() => setUnusedState({}), [])
+  const updateOrder = (id, newOrder) => {
+    fetch(`/orden/${id}`, {
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newOrder)
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        // history.goBack()
+      })
+  }
 
   const price = watch("price");
   const anticipo = watch("anticipo");
@@ -163,6 +180,39 @@ const CardOrderNew2 = () => {
     setValue("solutions", solutionsFiltered)
   }
 
+  const [, setUnusedState] = useState()
+  const forceUpdate = useCallback(() => setUnusedState({}), [])
+
+  useEffect(() => {
+    if (!isAddMode) {
+      fetch(`/orden/${id}`)
+        .then(res => res.json())
+        .then(({ query }) => {
+
+          console.log(query)
+
+          setValue("status", query.status_id)
+          setValue("status", query.device)
+          setValue("client_id", query.client_id)
+          setValue("marca_id", query.marca_id)
+
+          query.receptionDate = new Date(query.receptionDate)
+          query.deadlineDate = new Date(query.deadlineDate)
+          const fields = [
+            "folio", "receptionDate", "deadlineDate", "client_id", "telefono1", "telefono2", "marca_id", "modelo_id", "dejo",
+            "encendido", "falla_id", "solucion_id", "battery", "chip", "msd", "charger", "pin1", "pin2", "price", "anticipo", "remain",
+            "notes", "status", "device"
+          ]
+          fields.map(field => setValue(field, query[field]))
+        })
+    } else {
+      fetch("/folio")
+        .then(res => res.json())
+        .then(({ folio }) => setValue("folio", folio || 'RC0860' ))
+
+    }
+  }, [isAddMode, id, setValue])
+
   return (
     <div className="">
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-200 border-0">
@@ -183,7 +233,7 @@ const CardOrderNew2 = () => {
                     Folio
                   </label>
                   <input
-                    // disabled
+                    disabled
                     {...register("folio", {})}
                     autoComplete="off"
                     type="text"
@@ -211,7 +261,7 @@ const CardOrderNew2 = () => {
                         popperPlacement='bottom'
                         popperModifiers={{
                           flip: {
-                            behavior: ['bottom']
+                            behavior: ['bottom'] // don't allow it to flip to be above
                           },
                           preventOverflow: {
                             enabled: false // tell it not to try to stay within the view (this prevents the popper from covering the element you clicked)
@@ -278,83 +328,62 @@ const CardOrderNew2 = () => {
 
               <div className="w-full lg:w-4/12 px-4">
                 <label
-                  className="block uppercase text-gray-700 text-xs font-bold mt-2"
+                  className="block uppercase text-gray-700 text-xs font-bold mb-2"
+                  htmlFor="deadlineDate"
                 >
                   Estado
                 </label>
-                {
-                  (() => {
-                    
-                    const defaultStatus = statuses.filter( ({status}) => status.toLowerCase().includes('reparar'))[0]
+                <Controller
+                  name="status_id"
+                  control={control}
+                  render={({ field: { onChange, value } }) => {
 
+                    const defaultStatus = statuses.filter( status => status.status.toLowerCase().includes('reparar'))[0]
+                    
                     return (
-                      <select
-                        // defaultValue={ Number(defaultStatus?.id) }
-                        onClick={handleClientsChange}
-                        // onChange={onChange}
-                        // value={value}
-                        {...register("status_id")}
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                      >
-                        <option defaultValue={null}></option>
-                        {/* <option value={ Number(defaultStatus?.id) }>{ defaultStatus?.status }</option> */}
+                      <select {...register("status")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                        <option defaultValue={ defaultStatus?.id }>{ defaultStatus?.status }</option>
                         {
                           statuses
                             // Quitar el estado por defecto de la lista de estados disponibles
-                            //  .filter( (status) => !status.status.toLowerCase().includes('reparar') )
-                            .map(({ status, id }) => (
-                              <option key={id} value={Number(id)} >{status}</option>
-                            )
-                            )
+                            .filter( status => !status.status.toLowerCase().includes('reparar'))
+                            .map(({ status, id }) => {
+                              return (
+                                <option key={id} value={Number(id)} >{status}</option>
+                              )
+                          })
                         }
                       </select>
                     )
-                  })()
-                }
-                {/* )
                   }}
-                /> */}
+                />
               </div>
 
-              <div className="w-full lg:w-4/12 px-4 mt-2">
+              <div className="w-full lg:w-4/12 px-4">
                 <label
                   className="block uppercase text-gray-700 text-xs font-bold mb-2"
+                  htmlFor="deadlineDate"
                 >
                   Equipo
                 </label>
-                {/* <Controller
-                    name="device_id"
-                    control={control}
-                    render={({ field: { onChange, value } }) => {
-                 */}
-                {
-                  (() => {
-                    const defaultDevice = devices.filter(({ device }) => device.toLowerCase().includes('tel'))[0]
-
+                <Controller
+                  name="device_id"
+                  control={control}
+                  render={({ field: { onChange, value } }) => {
                     return (
-                      <select
-                        defaultValue={Number(defaultDevice?.id)}
-                        onClick={handleClientsChange}
-                        {...register("device_id")}
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                      >
+                      <select {...register("device")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                         <option defaultValue={null}></option>
-                        {/* <option value={Number(defaultDevice?.id)}>{defaultDevice?.device}</option> */}
                         {
-                          devices
-                            // .filter((device) => !device.device.toLowerCase().includes('tel'))
-                            .map(({ id, device }) => {
-                              return (
-                                <option key={id} value={ Number(id) } >{device}</option>
-                              )
-                            })
+                          devices.map(({ id, device }) => {
+                            return (
+                              <option key={id} value={Number(id)} >{device}</option>
+                            )
+                          })
                         }
                       </select>
                     )
-                  }
-                  )()
-                }
-
+                  }}
+                />
               </div>
             </div>
             <hr className="mt-6 border-b-1 border-gray-400" />
@@ -378,7 +407,7 @@ const CardOrderNew2 = () => {
                   >
                     Cliente
                   </label>
-                  {/* <Controller
+                  <Controller
                     name="client_id"
                     control={control}
                     render={({ field: { onChange, value } }) => {
@@ -386,7 +415,6 @@ const CardOrderNew2 = () => {
                         <select
                           onClick={handleClientsChange}
                           onChange={onChange}
-                          value={value}
                           {...register("client_id")}
                           className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         >
@@ -399,25 +427,7 @@ const CardOrderNew2 = () => {
                         </select>
                       )
                     }}
-                  /> */}
-                  {
-                    (() => {
-                      return (
-                        <select
-                          onClick={handleClientsChange}
-                          {...register("client_id")}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                        >
-                          <option defaultValue={null}>{ }</option>
-                          {
-                            clients?.map(({ id, nombre, apellido_paterno, apellido_materno }) => {
-                              return <option key={`${nombre} ${id}`} value={id}>{nombre} {apellido_paterno} {apellido_materno}</option>
-                            })
-                          }
-                        </select>
-                      )
-                    })()
-                  }
+                  />
 
                 </div>
               </div>
@@ -503,7 +513,7 @@ const CardOrderNew2 = () => {
                   >
                     Marca
                   </label>
-                  {/* <Controller
+                  <Controller
                     name={"marca_id"}
                     control={control}
                     render={({ field: { onChange, value } }) => {
@@ -532,32 +542,7 @@ const CardOrderNew2 = () => {
                       )
                     }
                     }
-                  /> */}
-                  {
-                    (() => {
-                      return (
-                        <select
-                          onClick={() => {
-                            handleModelsChange()
-                            forceUpdate()
-                          }}
-                          {...register("marca_id")}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                        >
-                          <option defaultValue={null}></option>
-                          {
-                            brands.map(({ marca, id }) => {
-                              return <option
-                                key={marca}
-                                value={parseInt(id, 10)}
-                                onClick={() => setValue("marca_id", id)}
-                              >{marca}</option>
-                            })
-                          }
-                        </select>
-                      )
-                    })()
-                  }
+                  />
                 </div>
               </div>
               <div className="w-full lg:w-3/12 px-4">
@@ -571,18 +556,18 @@ const CardOrderNew2 = () => {
                   name="modelo_id"
                   control={control}
                   render={({ field: { onChange, value = null } }) => {
-
+                    
                     return (
                       <select
-                        onChange={onChange}
-                        value={String(value)}
+                        onChange={ onChange }
+                        value={ String(value) }
                         className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
-                        <option defaultValue={null}></option>
+                        <option defaultValue={ null }></option>
                         {
                           getValues("models")?.map(({ id, modelo }) => {
                             return (<option
-
+                              
                               // onClick={() => setValue("modelo_id", Number(id))}
                               onClick={() => console.log(id)}
                               key={modelo}
@@ -631,9 +616,8 @@ const CardOrderNew2 = () => {
                   }
                 /> */}
               </div>
-
-              <div className="w-full lg:w-3/12 px-4 mt-2">
-                <div className="relative w-full ">
+              <div className="w-full lg:w-3/12 px-4">
+                <div className="relative w-full mb-3">
                   <label
                     className="block uppercase text-gray-700 text-xs font-bold mb-2"
                     htmlFor="grid-password"
@@ -641,22 +625,22 @@ const CardOrderNew2 = () => {
                     Dejo
                   </label>
                   <button
+                    {...register("modelo_id", {})}
                     className={(getValues("dejo") ? "bg-blue-500 " : "bg-blue-300") +
                       " text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     }
                     type="button"
                     onClick={() => {
                       forceUpdate();
-                      setValue("dejo", !getValues("dejo"), { shouldValidate: true })
+                      setValue('dejo', !getValues("dejo"), { shouldValidate: true })
                     }}
                   >
                     {getValues("dejo") ? "Si" : "No"}
                   </button>
                 </div>
               </div>
-
-              <div className="w-full lg:w-3/12 px-4 mt-2">
-                <div className="relative w-full">
+              <div className="w-full lg:w-3/12 px-4">
+                <div className="relative w-full mb-3">
                   <label
                     className="block uppercase text-gray-700 text-xs font-bold mb-2"
                     htmlFor="grid-password"
@@ -781,8 +765,6 @@ const CardOrderNew2 = () => {
                   </select> */}
                 </div>
               </div>
-
-
               <div className="w-full lg:w-4/12 px-4">
                 <div className="relative w-full mb-3">
                   <label
@@ -992,5 +974,3 @@ const CardOrderNew2 = () => {
     </div>
   );
 }
-
-export default CardOrderNew2

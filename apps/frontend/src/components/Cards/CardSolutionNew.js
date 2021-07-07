@@ -103,8 +103,8 @@ export default function CardSolutionNew() {
                   >
                     Falla
                   </label>
-                  <select {...register("falla_id")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                    <option selected value={null}></option>
+                  <select defaultValue={ null } {...register("falla_id")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                    {/* <option  value={null}></option> */}
                     {
                       faults.map( ({id, falla}) => {
                         return <option key={falla} value={parseInt(id)}>{ falla }</option>

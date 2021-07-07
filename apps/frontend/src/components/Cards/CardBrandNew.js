@@ -3,6 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { brandSchema } from "schemas/schemas";
+import InputBoxForm from "components/Forms/InputBoxForm";
 
 
 export default function CardBrandNew() {
@@ -85,22 +86,7 @@ export default function CardBrandNew() {
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form  onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
-              <div className="w-full px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Nombre
-                  </label>
-                  <input
-                    {...register("marca", { required: true })}
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
+              <InputBoxForm register={ register } required large label="Nombre" input="marca" />
             </div>
             <div className="flex flex-wrap mt-6 justify-end">
             <button

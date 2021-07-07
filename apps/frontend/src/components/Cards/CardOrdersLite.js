@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { DateTime } from 'luxon';
 
 import CardOrdersDropdown from "components/Dropdowns/CardOrdersDropdown.js";
 
 // components
 import CardModal from "components/Cards/CardModal.js";
-import { getBackColor } from "utils/utils";
 
 export default function CardOrdersLite({ color }) {
 
@@ -22,6 +22,10 @@ export default function CardOrdersLite({ color }) {
     fetch("/orden")
       .then(res => res.json())
       .then(({ res }) => setOrders(res))
+  }
+
+  const toggleModal = () => {
+    setShowModal(true)
   }
 
   return (
@@ -120,9 +124,6 @@ export default function CardOrdersLite({ color }) {
             <tbody>
               {
                 orders.map( (order, index) => {
-
-                  order.receptionDate = new Date(Date.parse(order.receptionDate) - 25200000).toISOString().substring(0, 16).replace("T", " ")
-                  order.deadlineDate = new Date(Date.parse(order.deadlineDate) - 25200000).toISOString().substring(0, 16).replace("T", " ")
                   
                   return (
                     <tr
@@ -133,30 +134,30 @@ export default function CardOrdersLite({ color }) {
                       }}
                       key={order.id}
                     >
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                      { order.receptionDate.replace("T", " ").substring(0, 16) }
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                        { DateTime.fromMillis( order.receptionDate ).toLocaleString(DateTime.DATETIME_MED) }
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        <span className={getBackColor(order.status) + "text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"}>
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                        <span className={ order.color + "text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"}>
                         { order.folio }
                         </span>
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-normal p-4">
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-normal p-4">
                       { `${order.nombre} ${order.apellido_paterno} ${order.apellido_materno || ""}`.toUpperCase() }
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         {`${order.marca} ${order.modelo}`.toUpperCase()}
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         { `${order.falla}`.toUpperCase() }
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         { `$ ${order.price}` }
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { order.deadlineDate.replace("T", " ").substring(0, 16) }
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                        { DateTime.fromMillis( order.deadlineDate ).toLocaleString(DateTime.DATETIME_MED) }
                       </td>
-                      <td onClick={() => setShowModal(true)} className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
+                      <td onClick={ toggleModal } className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         <div className="flex justify-center">
                           <img
                             src={require("assets/img/daniel.jpg")}

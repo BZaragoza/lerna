@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router-dom";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { simSchema } from "schemas/schemas";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import { simSchema } from "schemas/schemas";
+
+import InputBoxForm from "components/Forms/InputBoxForm";
 
 
 
 const CardSimNew = () => {
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
-    resolver: yupResolver(simSchema)
+    // resolver: yupResolver(simSchema)
   });
-  
+
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
@@ -25,44 +27,75 @@ const CardSimNew = () => {
       : updateSim(id, data)
   }
 
-  const createSim = (newSim) => {
-    fetch("/chip", {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newSim)
-    })
-      .then( res => res.json() )
-      .then( res => { 
+  const createSim = async (newDevice) => {
+
+    try {
+      const rawRes = await fetch("/devices", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newDevice)
+      });
+      const res = await rawRes.json();
+
+
+      if (rawRes.status === '409') {
+        return console.log(res.msg)
+      } else if (rawRes.status === '422') {
+        return console.log(res.msg)
+      } else {
+
         console.log(res)
-        history.goBack()
-      })
+        return history.goBack()
+
+      }
+
+    } catch (err) {
+      console.log(err)
+    }
+
+
   }
 
-  const updateSim = (id, newSim) => {
-    fetch(`/chip/${id}`, {
-      method: "PUT",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newSim)
-    })
-      .then( res => res.json() )
-      .then( res => { 
+  const updateSim = async (id, newDevice) => {
+
+    try {
+      const rawRes = await fetch(`/devices/${id}`, {
+        method: "PUT",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newDevice)
+      });
+      const res = await rawRes.json();
+
+
+      if (rawRes.status === '409') {
+        return console.log(res.msg)
+      } else if (rawRes.status === '422') {
+        return console.log(res.msg)
+      } else {
+
         console.log(res)
-        history.goBack()
-      })
+        return history.goBack()
+
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+
   }
 
   useEffect(() => {
     if (!isAddMode) {
-      fetch(`/chip/${id}`)
-        .then( res => res.json() )
-        .then( ({ query }) => {
-          const fields = ['compañia'];
+      fetch(`/devices/${id}`)
+        .then(res => res.json())
+        .then(({ query }) => {
+          const fields = ['device'];
           fields.map(field => setValue(field, query[field]));
         });
     }
@@ -73,29 +106,21 @@ const CardSimNew = () => {
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-200 border-0">
         <div className="rounded-t bg-white mb-0 px-6 py-6">
           <div className="text-center flex justify-between">
-            <h6 className="text-gray-800 text-xl font-bold">{isAddMode ? "Nuevo" : "Editar"} Sim</h6>
+            <h6 className="text-gray-800 text-xl font-bold">{isAddMode ? "Nuevo" : "Editar"} Equipo</h6>
           </div>
         </div>
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
-              <div className="w-full px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Compañia
-                  </label>
-                  <input
-                    {...register("compañia", { required: true })}
 
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
+              <InputBoxForm
+                register={register}
+                label="Equipo"
+                input="device"
+                required
+                large
+              />
+
             </div>
             <div className="flex flex-wrap mt-6 justify-end">
               <button
@@ -111,7 +136,7 @@ const CardSimNew = () => {
 
             <label className="close cursor-pointer flex items-start justify-between w-full p-2 bg-green-500 h-24 rounded shadow-lg text-white" title="close">
               Toast Alert (click anywhere to close)
-            
+
               <svg className="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
                 <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
               </svg>
