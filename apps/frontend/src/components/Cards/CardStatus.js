@@ -62,16 +62,6 @@ const CardStatus = ({ color = 'light' }) => {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  ID
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
                   Estado
                 </th>
                 <th
@@ -99,24 +89,20 @@ const CardStatus = ({ color = 'light' }) => {
             <tbody>
 
               {
-                statuses.map( status => {
+                statuses.map( ({ status, id }) => {
                   return (
-                    <tr key={status.id}>
+                    <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {status.id}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {status.status}
+                        { status }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        <div className={status.color}  style={{
+                        <div className={ color } style={{
                           width:'50px',
                           height:'20px',
-                          // border:'1px solid #ccc',
                         }}></div>
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardEditDeleteDropdown id={status.id} table="status" fetchFunction={ fetchStatus }/>
+                        <CardEditDeleteDropdown path={ `/admin/status-new/${ id }` }  id={ id } table="status" fetchFunction={ fetchStatus }/>
                       </td>
                     </tr>
                   )

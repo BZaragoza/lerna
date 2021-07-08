@@ -105,10 +105,10 @@ const CardStatusNew = () => {
                 >
                   Color
                 </label>
-                <select defaultValue={null} {...register("color")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                <select defaultValue={null} {...register("color")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                   {
                     Object.keys(possibleColors).map( status => (
-                      <option key={ status } value={ possibleColors[status] } >{ status }</option>
+                      <option className="uppercase" key={ status } value={ possibleColors[status] } >{ status }</option>
                     ))
                   }       
                 </select>

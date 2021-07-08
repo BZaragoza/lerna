@@ -6,8 +6,9 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import { useForm, Controller } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
 import { DateTime } from 'luxon';
+import InputBoxForm from "components/Forms/InputBoxForm";
 
-const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 registerLocale("es", {
   ...es,
@@ -34,8 +35,8 @@ const CardOrderNew2 = () => {
 
 
   const { register, handleSubmit, setValue, getValues, watch, control } = useForm({
+    // resolver: yupResolver(orderSchema),
     defaultValues,
-    // resolver: yupResolver(orderSchema)
   })
 
   const [msd, setMsd] = useState([]);
@@ -47,7 +48,7 @@ const CardOrderNew2 = () => {
   const [clients, setClients] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [devices, setDevices] = useState([]);
-  // const [folio, setFolio] = useState(null)
+  const [technicians, setTechnicians] = useState([])
 
   useEffect(() => {
 
@@ -88,14 +89,18 @@ const CardOrderNew2 = () => {
       .then(({ res }) => setDevices(res))
 
     fetch("/folio")
-      .then( res => res.json() )
-      .then( ({ folio }) => setValue("folio", folio) )
+      .then(res => res.json())
+      .then(({ folio }) => setValue("folio", folio))
+
+      fetch("/technician")
+      .then(res => res.json())
+      .then(({ res }) => setTechnicians(res))
 
 
   }, [setValue]);
 
   const onSubmit = (data) => {
-    console.log(data)
+    
     delete data.models
     delete data.solutions
     data.remain = data.price - data.anticipo
@@ -105,9 +110,9 @@ const CardOrderNew2 = () => {
     data.deadlineDate = DateTime.fromJSDate(data.deadlineDate).ts
 
 
-
+    console.log(data)
     // return isAddMode
-    createOrder(data)
+    return createOrder(data)
     // ? createOrder(data)
     // : updateOrder(id, data)
   }
@@ -174,37 +179,28 @@ const CardOrderNew2 = () => {
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
+
+              <InputBoxForm
+                register={register}
+                label="Folio"
+                input="folio"
+                // disabled
+                required
+              />
+
               <div className="w-full lg:w-4/12 px-4">
                 <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="folio"
-                  >
-                    Folio
-                  </label>
-                  <input
-                    // disabled
-                    {...register("folio", {})}
-                    autoComplete="off"
-                    type="text"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
+                  
+                  <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Fecha Recepcion
                   </label>
+                  
                   <Controller
                     name={"receptionDate"}
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return <DatePicker
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         onChange={e => onChange(e)}
                         selected={value}
                         name="startDate"
@@ -234,18 +230,17 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-4/12 px-4">
                 <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="deadlineDate"
-                  >
+                  
+                  <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Fecha a Entregar
                   </label>
+
                   <Controller
                     name={"deadlineDate"}
                     control={control}
                     render={({ field: { onChange, value } }) => {
                       return <DatePicker
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase  px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         onChange={e => onChange(e)}
                         selected={value}
                         name="startDate"
@@ -277,15 +272,13 @@ const CardOrderNew2 = () => {
 
 
               <div className="w-full lg:w-4/12 px-4">
-                <label
-                  className="block uppercase text-gray-700 text-xs font-bold mt-2"
-                >
+                <label className="block uppercase text-gray-700 text-xs font-bold mt-2" >
                   Estado
                 </label>
                 {
                   (() => {
-                    
-                    const defaultStatus = statuses.filter( ({status}) => status.toLowerCase().includes('reparar'))[0]
+
+                    // const defaultStatus = statuses.filter(({ status }) => status.toLowerCase().includes('reparar'))[0]
 
                     return (
                       <select
@@ -294,7 +287,7 @@ const CardOrderNew2 = () => {
                         // onChange={onChange}
                         // value={value}
                         {...register("status_id")}
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase  px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
                         <option defaultValue={null}></option>
                         {/* <option value={ Number(defaultStatus?.id) }>{ defaultStatus?.status }</option> */}
@@ -311,32 +304,22 @@ const CardOrderNew2 = () => {
                     )
                   })()
                 }
-                {/* )
-                  }}
-                /> */}
               </div>
 
               <div className="w-full lg:w-4/12 px-4 mt-2">
-                <label
-                  className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                >
+                <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                   Equipo
                 </label>
-                {/* <Controller
-                    name="device_id"
-                    control={control}
-                    render={({ field: { onChange, value } }) => {
-                 */}
                 {
                   (() => {
                     const defaultDevice = devices.filter(({ device }) => device.toLowerCase().includes('tel'))[0]
 
                     return (
                       <select
-                        defaultValue={Number(defaultDevice?.id)}
+                        defaultValue={ Number(defaultDevice?.id) || null }
                         onClick={handleClientsChange}
                         {...register("device_id")}
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
                         <option defaultValue={null}></option>
                         {/* <option value={Number(defaultDevice?.id)}>{defaultDevice?.device}</option> */}
@@ -345,7 +328,7 @@ const CardOrderNew2 = () => {
                             // .filter((device) => !device.device.toLowerCase().includes('tel'))
                             .map(({ id, device }) => {
                               return (
-                                <option key={id} value={ Number(id) } >{device}</option>
+                                <option key={id} value={Number(id)} >{device}</option>
                               )
                             })
                         }
@@ -354,9 +337,44 @@ const CardOrderNew2 = () => {
                   }
                   )()
                 }
-
               </div>
+
+              <div className="w-full lg:w-4/12 px-4 mt-2">
+                <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
+                  Técnico
+                </label>
+                {
+                  (() => {
+                    return (
+                      <select
+                        defaultValue={ null }
+                        onClick={handleClientsChange}
+                        {...register("technician_id")}
+                        className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                      >
+                        <option defaultValue={null}></option>
+                        {/* <option value={Number(defaultDevice?.id)}>{defaultDevice?.device}</option> */}
+                        {
+                          technicians
+                            // .filter((device) => !device.device.toLowerCase().includes('tel'))
+                            .map(({ id, name }) => {
+                              return (
+                                <option key={id} value={Number(id)} >{ name }</option>
+                              )
+                            })
+                        }
+                      </select>
+                    )
+                  }
+                  )()
+                }
+              </div>
+
+
             </div>
+
+            
+            
             <hr className="mt-6 border-b-1 border-gray-400" />
             <h6 className="text-gray-500 text-sm mt-3 mb-6 font-bold uppercase flex justify-between">
               Informacion Cliente
@@ -406,7 +424,7 @@ const CardOrderNew2 = () => {
                         <select
                           onClick={handleClientsChange}
                           {...register("client_id")}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                          className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         >
                           <option defaultValue={null}>{ }</option>
                           {
@@ -423,12 +441,11 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-3/12 px-4">
                 <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
+                  
+                  <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Telefono 1
                   </label>
+
                   <Controller
                     name="telefono1"
                     control={control}
@@ -449,12 +466,11 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-3/12 px-4">
                 <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
+                  
+                  <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Telefono 2
                   </label>
+
                   <Controller
                     name="telefono2"
                     control={control}
@@ -542,7 +558,7 @@ const CardOrderNew2 = () => {
                             forceUpdate()
                           }}
                           {...register("marca_id")}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                          className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         >
                           <option defaultValue={null}></option>
                           {
@@ -576,7 +592,7 @@ const CardOrderNew2 = () => {
                       <select
                         onChange={onChange}
                         value={String(value)}
-                        className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase  px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
                         <option defaultValue={null}></option>
                         {
@@ -720,7 +736,7 @@ const CardOrderNew2 = () => {
                             forceUpdate()
                           }}
                           value={value}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                          className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         >
                           <option defaultValue={null}></option>
                           {
@@ -759,7 +775,7 @@ const CardOrderNew2 = () => {
                         <select
                           onChange={onChange}
                           value={value}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                          className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                           <option defaultValue={null}></option>
                           {
                             getValues("solutions")?.map(({ id, solucion }) => {
@@ -813,7 +829,7 @@ const CardOrderNew2 = () => {
                   >
                     Chip
                   </label>
-                  <select {...register("chip", {})} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                  <select {...register("chip", {})} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                     <option defaultValue={null}></option>
                     {
                       chip.map(({ compañia, id }) => {
@@ -831,7 +847,7 @@ const CardOrderNew2 = () => {
                   >
                     MSD
                   </label>
-                  <select {...register("msd", {})} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                  <select {...register("msd", {})} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                     <option defaultValue={null}></option>
                     {
                       msd.map(({ capacidad, id }) => {
@@ -868,90 +884,46 @@ const CardOrderNew2 = () => {
                   </button>
                 </div>
               </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Pin o Patron
-                  </label>
-                  <input
-                    {...register("pin1")}
 
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Pin o Patron 2
-                  </label>
-                  <input
-                    {...register("pin2")}
+              <InputBoxForm
+                register={register}
+                label="Pin o Patron"
+                input="pin1"
+                required
+              />
 
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
+              <InputBoxForm
+                register={register}
+                label="Pin o Patron 2"
+                input="pin2"
+                // required
+              />
             </div>
 
             <hr className="mt-6 border-b-1 border-gray-400" />
             <div className="flex flex-wrap mt-6">
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Precio
-                  </label>
-                  <input
-                    {...register("price", { max: 99999 })}
-                    type="number"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                  >
-                    Anticipo
-                  </label>
-                  <input
-                    {...register("anticipo")}
-                    type="number"
-                    disabled={!Boolean(getValues("price"))}
-                    // disabled={!Boolean(getValues("price"))}
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-4/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                  >
-                    Resta
-                  </label>
-                  <input
-                    {...register("remain")}
-                    disabled
-                    type="number"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-              </div>
+              <InputBoxForm
+                register={register}
+                label="Precio"
+                input="price"
+                required
+              />
+
+              <InputBoxForm
+                register={register}
+                label="Anticipo"
+                input="anticipo"
+                required
+              />
+
+              <InputBoxForm
+                register={register}
+                label="Resta"
+                input="remain"
+                type="number"
+                required
+                disabled
+              />
             </div>
 
             <hr className="mt-6 border-b-1 border-gray-400" />
@@ -960,22 +932,15 @@ const CardOrderNew2 = () => {
               Inormacion Adicional
             </h6>
             <div className="flex flex-wrap">
-              <div className="w-full lg:w-12/12 px-4">
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Notas
-                  </label>
-                  <textarea
-                    {...register("notes")}
-                    type="text"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                    rows="2"
-                  ></textarea>
-                </div>
-              </div>
+
+              <InputBoxForm
+                register={register}
+                label="Notas"
+                input="notes"
+                required
+                large
+              />
+
             </div>
             <hr className="mt-6 border-b-1 border-gray-400" />
             <div className="flex flex-wrap mt-6 justify-end">

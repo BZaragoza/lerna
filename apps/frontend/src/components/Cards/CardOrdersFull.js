@@ -290,16 +290,6 @@ export default function CardOrdersFull({ color }) {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Entregado
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
                   Tecnico
                 </th>
                 <th
@@ -419,13 +409,6 @@ export default function CardOrdersFull({ color }) {
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         {`${notes}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {
-                          status === "Entregado"
-                            ? <span role="img" aria-label="Entregado">&#10004;</span>
-                            : <span role="img" aria-label="Sin entregar">&#10060;</span>
-                        }
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         <div className="flex justify-center">

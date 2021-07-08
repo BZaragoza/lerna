@@ -1,31 +1,30 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { modelSchema } from "schemas/schemas";
+import InputBoxForm from "components/Forms/InputBoxForm";
 
 
 export default function CardModelNew() {
 
-  const { register, handleSubmit, setValue, formState: { errors }} = useForm({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(modelSchema)
   })
 
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
-  
+
   const [brands, setBrands] = useState([]);
-  // const [model, setModel] = useState({});
 
   console.log(errors)
-  console.log(id)
 
   useEffect(() => {
-    
-    fetch("http://localhost:8080/marcas")
-      .then( res => res.json() )
-      .then( ({ res }) => { 
+
+    fetch("/marcas")
+      .then(res => res.json())
+      .then(({ res }) => {
         setBrands(res)
       })
 
@@ -63,25 +62,24 @@ export default function CardModelNew() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(newModel)
-      })
+    })
       .then(res => res.json())
       .then(res => {
-        history.goBack() 
+        history.goBack()
         console.log(res)
       })
   }
-     
+
   useEffect(() => {
     if (!isAddMode) {
       fetch(`/modelos/${id}`)
-        .then( res => res.json() )
-        .then( ({ query }) => {
-          const fields = ["marca_id", "modelo", "modelo_num"]  
-          fields.map(field => setValue(field, query[field]) )
-          // setModel(model => ({...model}));
+        .then(res => res.json())
+        .then(({ query }) => {
+          const fields = ["marca_id", "modelo", "modelo_num"]
+          fields.map(field => setValue(field, query[field]));
         })
     }
-   
+
   }, [isAddMode, id, setValue]);
 
 
@@ -90,54 +88,47 @@ export default function CardModelNew() {
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-200 border-0">
         <div className="rounded-t bg-white mb-0 px-6 py-6">
           <div className="text-center flex justify-between">
-            <h6 className="text-gray-800 text-xl font-bold">{isAddMode ? "Nuevo" : "Editar" } Modelo</h6>
+            <h6 className="text-gray-800 text-xl font-bold">{isAddMode ? "Nuevo" : "Editar"} Modelo</h6>
           </div>
         </div>
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
+
               <div className="w-full px-4">
                 <div className="relative w-full mb-3">
-                  <select {...register("marca_id")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                    <option selected value={null}></option>
+                <label
+                  className="block uppercase text-gray-700 text-xs font-bold mb-2"
+                >
+                  Marcas
+                </label>
+                  <select {...register("marca_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                    <option defaultValue={null}></option>
                     {
-                      brands.map( ({ marca, id }) => {
-                        return <option key={marca} value={id}>{ marca }</option>
+                      brands.map(({ marca, id }) => {
+                        return <option key={marca} value={id}>{marca}</option>
                       })
                     }
                   </select>
                 </div>
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Modelo
-                  </label>
-                  <input
-                    {...register("modelo", {required: true })}
-
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Modelo Numerico
-                  </label>
-                  <input
-                    {...register("modelo_num", { required: true })}
-
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
               </div>
+
+              <InputBoxForm
+                register={register}
+                label="Modelo"
+                input="modelo"
+                required
+                large
+              />
+
+              <InputBoxForm
+                register={register}
+                label="Modelo Numerico"
+                input="modelo_num"
+                required
+                large
+              />
+
             </div>
             <div className="flex flex-wrap mt-6 justify-end">
               <button
@@ -145,7 +136,7 @@ export default function CardModelNew() {
                 type="submit"
               >
                 Guardar
-            </button>
+              </button>
             </div>
           </form>
         </div>

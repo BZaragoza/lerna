@@ -1,32 +1,24 @@
 // import React, { useState, useEffect } from "react";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
-
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
-import { useFetch } from "hooks/useFetch";
+import CardEditDeleteDropdown from 'components/Dropdowns/CardEditDeleteDropdown';
 
 export default function CardFaults({ color }) {
 
-  const[ faults, setFaults, loading ] = useFetch("/fallas");
+  const [faults, setFaults] = useState([]);
 
-  // console.log( loading )
+  useEffect(() => {
+    fetchFaults();
+  }, []);
 
-  // console.log(faults)
-
-  // const [faults, setFaults] = useState([]);
-
-  // useEffect(() => {
-  //   fetchFaults();
-  // }, []);
-
-  // const fetchFaults = () => {
-  //   fetch("/fallas")
-  //     .then(res => res.json())
-  //     .then(({ res }) => setFaults(res))
-  // }
+  const fetchFaults = () => {
+    fetch("/fallas")
+      .then(res => res.json())
+      .then(({ res }) => setFaults(res))
+  }
 
 
   return (
@@ -100,7 +92,6 @@ export default function CardFaults({ color }) {
             </thead>
             <tbody>
               {
-                !loading && 
                 faults?.map( ({ id, falla, descripcion }) => {
                   return (
                     <tr key={ id }>
@@ -111,7 +102,14 @@ export default function CardFaults({ color }) {
                         { descripcion }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="fault-new" id={ id } setState={ setFaults } table={"fallas"}/>
+                       
+                        <CardEditDeleteDropdown
+                          path={ `fault-new/${ id }` }
+                          id={ id }
+                          fetchFunction={ fetchFaults }
+                          table={ "fallas" }
+                        />
+
                       </td>
                     </tr>
                   )

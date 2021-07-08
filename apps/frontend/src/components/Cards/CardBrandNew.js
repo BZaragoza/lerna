@@ -6,7 +6,7 @@ import { brandSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
 
 
-export default function CardBrandNew() {
+const CardBrandNew = () => {
 
   const { register, handleSubmit, setValue, formState: { errors }} = useForm({
     resolver: yupResolver(brandSchema)
@@ -15,8 +15,6 @@ export default function CardBrandNew() {
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
-  
-  // const [brand, setBrand] = useState({});
 
   console.log(errors)
 
@@ -67,8 +65,7 @@ export default function CardBrandNew() {
         .then( res => res.json() )
         .then( ({ query }) => {
           const fields = ["marca"]  
-          fields.map(field => setValue(field, query[field]) )
-          // setBrand(brand);
+          fields.map(field => setValue(field, query[field]) );
         })
     }
    
@@ -86,7 +83,15 @@ export default function CardBrandNew() {
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form  onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
-              <InputBoxForm register={ register } required large label="Nombre" input="marca" />
+              
+              <InputBoxForm 
+                register={ register }
+                label="Nombre"
+                input="marca" 
+                required 
+                large
+              />
+              
             </div>
             <div className="flex flex-wrap mt-6 justify-end">
             <button
@@ -102,3 +107,5 @@ export default function CardBrandNew() {
     </>
   );
 }
+
+export default CardBrandNew;

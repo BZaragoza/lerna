@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup"
 import { solutionSchema } from "../../schemas/schemas";
 
+import InputBoxForm from "components/Forms/InputBoxForm";
+
 // components
 
 export default function CardSolutionNew() {
@@ -17,7 +19,6 @@ export default function CardSolutionNew() {
   const isAddMode = !id;
 
   const [faults, setFaults] = useState([]);
-  // const [solution, setSolution] = useState({});
 
   console.log(errors);
 
@@ -37,9 +38,9 @@ export default function CardSolutionNew() {
       },
       body: JSON.stringify(newSolution)
     })
-      .catch( err => console.log(err))
-      .then( res => res.json() )
-      .then( res => {
+      .catch(err => console.log(err))
+      .then(res => res.json())
+      .then(res => {
         console.log(res)
         history.goBack()
       })
@@ -55,33 +56,32 @@ export default function CardSolutionNew() {
       },
       body: JSON.stringify(newSolution)
     })
-      .then( res => res.json() )
-      .then( res => {
+      .then(res => res.json())
+      .then(res => {
         console.log(res)
         history.goBack()
       })
   }
-   
+
 
   useEffect(() => {
 
     fetch("/fallas")
-      .then( res => res.json() )
-      .then( ({ res }) => setFaults(res) )
+      .then(res => res.json())
+      .then(({ res }) => setFaults(res))
 
   }, [])
 
   useEffect(() => {
     if (!isAddMode) {
       fetch(`/soluciones/${id}`)
-        .then( res => res.json() )
-        .then( ({ query }) => {
-          const fields = ["falla_id", "solucion", "descripcion"]  
-          fields.map(field => setValue(field, query[field]) )
-          // setSolution(solution);
+        .then(res => res.json())
+        .then(({ query }) => {
+          const fields = ["falla_id", "solucion", "descripcion"]
+          fields.map(field => setValue(field, query[field]))
         })
     }
-   
+
   }, [id, isAddMode, setValue]);
 
   return (
@@ -95,6 +95,7 @@ export default function CardSolutionNew() {
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
+
               <div className="w-full px-4">
                 <div className="relative w-full mb-3">
                   <label
@@ -103,54 +104,42 @@ export default function CardSolutionNew() {
                   >
                     Falla
                   </label>
-                  <select defaultValue={ null } {...register("falla_id")} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                    {/* <option  value={null}></option> */}
+                  <select defaultValue={null} {...register("falla_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                    <option value={null}></option>
                     {
-                      faults.map( ({id, falla}) => {
-                        return <option key={falla} value={parseInt(id)}>{ falla }</option>
+                      faults.map(({ id, falla }) => {
+                        return <option key={falla} value={parseInt(id)}>{falla}</option>
                       })
                     }
-                  </select>  
-                </div>
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="solucion"
-                  >
-                    Solucion
-                  </label>
-                  <input
-                    {...register("solucion", {required: true})}
-
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
-                </div>
-                <div className="relative w-full mb-3">
-                  <label
-                    className="block uppercase text-gray-700 text-xs font-bold mb-2"
-                    htmlFor="grid-password"
-                  >
-                    Descripcion de Solucion
-                  </label>
-                  <input
-                    {...register("descripcion", {required: true})}
-
-                    type="text"
-                    autoComplete="off"
-                    className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                  />
+                  </select>
                 </div>
               </div>
+
+              <InputBoxForm
+                register={register}
+                label="Solucion"
+                input="solucion"
+                required
+                large
+              />
+
+              <InputBoxForm
+                register={register}
+                label="Descripcion de Solucion"
+                input="descripcion"
+                required
+                large
+              />
+
             </div>
+
             <div className="flex flex-wrap mt-6 justify-end">
-            <button
-              className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-              type="submit"
-            >
-              Guardar
-            </button>
+              <button
+                className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                type="submit"
+              >
+                Guardar
+              </button>
             </div>
           </form>
         </div>

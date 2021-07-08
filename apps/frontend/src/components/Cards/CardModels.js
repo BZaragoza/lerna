@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 // components
 
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardModels({ color }) {
 
@@ -99,20 +99,27 @@ export default function CardModels({ color }) {
             </thead>
             <tbody>
               {
-                models.map(model => {
+                models.map(({ id, modelo, modelo_num, marca }) => {
                   return (
-                    <tr key={model.id}>
+                    <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {model.marca}
+                        { marca }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {model.modelo}
+                        { modelo }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {model.modelo_num}
+                        { modelo_num }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="model-new" id={model.id} fetchAgain={fetchModels} table={"modelos"}/>
+                        
+                        <CardEditDeleteDropdown 
+                          path={ `model-new/${ id }` }
+                          id={ id }
+                          fetchFunction={ fetchModels }
+                          table={ "modelos" }
+                        />
+
                       </td>
                     </tr>
                   )

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,13 +6,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { clientSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
 
-export default function CardClientNew( props ) {
+export default function CardClientNew() {
 
-  console.log(props)
+  const defaultValues = {
+    nombre: "",
+    apellido_paterno: "",
+    apellido_materno: "",
+    telefono1: "844",
+    telefono2: "",
+    notas: "",
+  }
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
-    resolver: yupResolver(clientSchema)
-  })
+    resolver: yupResolver(clientSchema),
+    defaultValues
+  });
 
   const history = useHistory();
   const { id } = useParams();
@@ -67,8 +75,7 @@ export default function CardClientNew( props ) {
         .then( res => res.json() )
         .then( ({query}) => {
           const fields = ['nombre', 'apellido_paterno', 'apellido_materno', 'telefono1', 'telefono2', 'notas'];
-          fields.map(field => setValue(field, query[field]));
-          // setClient(client);
+          fields.map(field => setValue(field, query[field] || "" ));
         });
     }
   }, [isAddMode, id, setValue]);

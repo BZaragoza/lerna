@@ -1,29 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 // components
 
 import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
-import { useFetch } from "hooks/useFetch";
 
 export default function CardSolutions({ color }) {
 
-  // const [solutions, setSolutions] = useState([]);
+  const [solutions, setSolutions] = useState([]);
 
-  // useEffect(() => {
-  //   fetchSolutions()
-  // }, [])
+  useEffect(() => {
+    fetchSolutions()
+  }, [])
 
-  // const fetchSolutions = () => {
-  //   fetch("/soluciones")
-  //     .then(res => res.json())
-  //     .then(({ res }) => {
-  //       setSolutions(res)
-  //     })
-  // }
-
-  const[ solutions, setSolutions, loading ] = useFetch("/soluciones");
+  const fetchSolutions = () => {
+    fetch("/soluciones")
+      .then(res => res.json())
+      .then(({ res }) => {
+        setSolutions(res)
+      })
+  };
 
   return (
     <>
@@ -106,7 +103,7 @@ export default function CardSolutions({ color }) {
             </thead>
             <tbody>
               {
-                !loading && solutions?.map( ({ id, falla, solucion, descripcion}) => {
+                solutions?.map( ({ id, falla, solucion, descripcion}) => {
                   return (
                     <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
@@ -119,7 +116,7 @@ export default function CardSolutions({ color }) {
                         { descripcion }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="solution-new" id={ id } fetchAgain={ setSolutions } table={"soluciones"}/>
+                        <CardBrandsModelsDropdown path="solution-new" id={ id } fetchAgain={ fetchSolutions } table={"soluciones"}/>
                       </td>
                     </tr>
                   )

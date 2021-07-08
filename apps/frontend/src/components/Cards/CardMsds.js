@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
-
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardMsds({ color }) {
 
@@ -82,14 +81,21 @@ export default function CardMsds({ color }) {
             </thead>
             <tbody>
               {
-                msds?.map( msd => {
+                msds?.map( ({ id, capacidad }) => {
                   return (
-                    <tr key={msd.id}>
+                    <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {msd.capacidad ? `${msd.capacidad} GB` : "No"} 
+                        { capacidad  ? `${ capacidad } GB` : "No"} 
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="msd-new" itemToUpdate={msd} id={msd.id} fetchAgain={fetchMsds} table={"msd"}/>
+
+                        <CardEditDeleteDropdown
+                          path={ `msd-new/${ id }` }
+                          id={ id }
+                          fetchFunction={ fetchMsds }
+                          table={"msd"}
+                        />
+
                       </td>
                     </tr>
                   )

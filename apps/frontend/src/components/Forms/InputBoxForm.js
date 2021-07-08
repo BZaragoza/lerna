@@ -1,6 +1,7 @@
 import React from 'react'
 
-const InputBoxForm = ({ register, label, input, required, large }) => {
+const InputBoxForm = ({ register, label, input, required, large, type="text", disabled, }) => {
+
 
   return (
     <div className={ `w-full px-4 ${!large && 'lg:w-4/12'}` }>
@@ -13,9 +14,10 @@ const InputBoxForm = ({ register, label, input, required, large }) => {
         </label>
         <input
           {...register(input, { required })}
-          type="text"
+          type={ type }
+          disabled={ disabled }
           autoComplete="off"
-          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+          className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
         />
       </div>
     </div>

@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 // components
-
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
 import { Link } from "react-router-dom";
-// import { useFetch } from "hooks/useFetch";
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardBrands({ color }) {
 
@@ -79,14 +77,21 @@ export default function CardBrands({ color }) {
             </thead>
             <tbody>
               {
-                brands.map( brand => {
+                brands.map( ({ id, marca }) => {
                   return (
-                    <tr key={brand.id}>
+                    <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {brand.marca}
+                        { marca }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="brand-new" id={ brand.id } fetchAgain={fetchBrands} table={"marcas"}/>
+
+                        <CardEditDeleteDropdown
+                          path={ `marcas-new/${ id }` }
+                          id={ id }
+                          fetchFunction={ fetchBrands }
+                          table={"marcas"}
+                        />
+
                       </td>
                     </tr>)
                 })

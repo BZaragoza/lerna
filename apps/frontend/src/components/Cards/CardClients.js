@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
-
-import CardClientDropdown from "components/Dropdowns/CardClientDropdown.js";
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardClients({ color = 'light' }) {
 
@@ -57,16 +56,6 @@ export default function CardClients({ color = 'light' }) {
           <table className="items-center w-full bg-transparent border-collapse">
             <thead>
               <tr>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  ID
-                </th>
                 <th
                   className={
                     "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
@@ -142,32 +131,36 @@ export default function CardClients({ color = 'light' }) {
             <tbody>
 
               {
-                clients.map( client => {
+                clients.map( ({ id, nombre, apellido_paterno, apellido_materno, telefono1, telefono2, notas, }) => {
                   return (
-                    <tr key={client.id}>
+                    <tr key={ id }>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.id}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.nombre}
+                        { nombre }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {client.apellido_paterno}
+                        { apellido_paterno }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.apellido_materno}
+                        { apellido_materno }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.telefono1}
+                        { telefono1 }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.telefono2}
+                        { telefono2 }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {client.notas}
+                        { notas }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardClientDropdown id={client.id} table="clientes" fetchClients={ fetchClients }/>
+
+                        <CardEditDeleteDropdown
+                          path={ `client-new/${  id  }` }
+                          id={  id  }
+                          fetchFunction={ fetchClients }
+                          table={"clientes"}
+                        />
+
                       </td>
                     </tr>
                   )

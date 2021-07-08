@@ -48,8 +48,8 @@ export const clientSchema = Yup.object().shape({
     telefono1: Yup.string().required("Teléfono 1 es requerido")
         .matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:true}),
         
-    telefono2: Yup.string().notRequired()
-        .matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:true}),
+    telefono2: Yup.string().notRequired(),
+        // .matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:false}),
 
     notas: Yup.string().notRequired()
 })
@@ -81,7 +81,7 @@ export const solutionSchema = Yup.object().shape({
 
 export const simSchema = Yup.object().shape({
     compañia: Yup.string().required("Compañia es requerido")
-        .min(3, "Compañia inválida")
+        .min(2, "Compañia inválida")
 });
 
 export const msdSchema = Yup.object().shape({

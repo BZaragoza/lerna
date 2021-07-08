@@ -2,7 +2,7 @@ import React, { useState, createRef } from "react";
 import { createPopper } from "@popperjs/core";
 import { Link } from "react-router-dom";
 
-export default function CardEditDeleteDropdown ({ table, id, fetchFunction }) {
+export default function CardEditDeleteDropdown ({ table, id, fetchFunction, path }) {
 
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = useState(false);
@@ -51,7 +51,7 @@ export default function CardEditDeleteDropdown ({ table, id, fetchFunction }) {
           "bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
         }
       >
-        <Link to={`/admin/${table}-new/${id}`} >
+        <Link to={ path } >
           <p className="cursor-pointer text-sm py-2 px-4 font-normal block w-full whitespace-no-wrap bg-transparent text-gray-800">
             Editar
           </p>

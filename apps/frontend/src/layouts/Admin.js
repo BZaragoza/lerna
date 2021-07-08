@@ -83,6 +83,7 @@ export default function Admin() {
             
             <Route path="/admin/technicals" exact component={ Technicals } />
             <Route path="/admin/technical-new" exact component={ TechnicalNew } />
+            <Route path="/admin/technical-new/:id" exact component={ TechnicalNew } />
             
             
             <Redirect from="/admin" to="/admin/dashboard" />
