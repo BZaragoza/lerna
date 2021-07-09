@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 // components
@@ -9,6 +9,8 @@ import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown"
 export default function CardModels({ color }) {
 
   const [models, setModels] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     fetchModels()
@@ -39,13 +41,15 @@ export default function CardModels({ color }) {
                   }
                 >
                   Modelos
-              </h3>
-                <button
-                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  <Link to="/admin/model-new">Nuevo Modelo</Link>
-            </button>
+                </h3>
+                <Link to={`/admin/model-new?last_url=${location.pathname}`}>
+                  <button
+                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Nuevo Modelo
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -101,23 +105,23 @@ export default function CardModels({ color }) {
               {
                 models.map(({ id, modelo, modelo_num, marca }) => {
                   return (
-                    <tr key={ id }>
+                    <tr key={id}>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { marca }
+                        {marca}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        { modelo }
+                        {modelo}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        { modelo_num }
+                        {modelo_num}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        
-                        <CardEditDeleteDropdown 
-                          path={ `model-new/${ id }` }
-                          id={ id }
-                          fetchFunction={ fetchModels }
-                          table={ "modelos" }
+
+                        <CardEditDeleteDropdown
+                          path={`model-new/${id}?last_url=${ location.pathname }`}
+                          id={id}
+                          fetchFunction={fetchModels}
+                          table={"modelos"}
                         />
 
                       </td>

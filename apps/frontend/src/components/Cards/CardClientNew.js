@@ -1,7 +1,8 @@
 import React, { useEffect, } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import queryString from 'query-string'
 
 import { clientSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
@@ -22,9 +23,12 @@ export default function CardClientNew() {
     defaultValues
   });
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
+
+  const { last_url } = queryString.parse( location.search )
   
 
   console.log( errors )
@@ -48,7 +52,9 @@ export default function CardClientNew() {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/clients')
       })
   }
 
@@ -65,7 +71,9 @@ export default function CardClientNew() {
       .then(res => res.json())
       .then(res => { 
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/clients')
       })
   }
 

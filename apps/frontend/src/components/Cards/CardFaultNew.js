@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { faultSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
-
+import queryString from 'query-string'
 
 
 export default function CardFaultNew() {
@@ -13,10 +13,13 @@ export default function CardFaultNew() {
     resolver: yupResolver(faultSchema)
   })
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
   
+  const { last_url } = queryString.parse( location.search )
+
   console.log(errors)
 
   const onSubmit = (data) => {
@@ -37,8 +40,10 @@ export default function CardFaultNew() {
     })
       .then( res => res.json() )
       .then( res => {
-        history.goBack() 
         console.log(res)
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/faults-solutions')
       })
 
   }
@@ -55,8 +60,10 @@ export default function CardFaultNew() {
     })
       .then( res => res.json() )
       .then( res => {
-        history.goBack() 
         console.log(res)
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/faults-solutions')
       })
 
   }

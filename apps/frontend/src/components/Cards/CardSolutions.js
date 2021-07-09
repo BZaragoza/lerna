@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 // components
 
-import CardBrandsModelsDropdown from "components/Dropdowns/CardBrandsModelsDropdown.js";
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardSolutions({ color }) {
 
   const [solutions, setSolutions] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     fetchSolutions()
@@ -42,7 +44,7 @@ export default function CardSolutions({ color }) {
                 >
                   Soluciones
               </h3>
-                <Link to="/admin/solution-new">
+                <Link to={`/admin/solution-new?last_url=${location.pathname}`}>
                   <button
                     className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
@@ -116,7 +118,12 @@ export default function CardSolutions({ color }) {
                         { descripcion }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardBrandsModelsDropdown path="solution-new" id={ id } fetchAgain={ fetchSolutions } table={"soluciones"}/>
+                        <CardEditDeleteDropdown 
+                          path={ `/admin/solution-new/${ id }?last_url=${location.pathname}` }
+                          id={ id }
+                          fetchFunction={ fetchSolutions }
+                          table={"soluciones"}
+                        />
                       </td>
                     </tr>
                   )

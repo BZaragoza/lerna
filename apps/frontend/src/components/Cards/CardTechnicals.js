@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+
+import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 // components
 
@@ -103,7 +104,6 @@ export default function CardTechnicals({ color }) {
                       </div>
                     </td>
                     <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                      {/* <CardBrandsModelsDropdown /> */}
                       <CardEditDeleteDropdown 
                         id={ id }
                         path={ `/admin/technical-new/${ id }` }

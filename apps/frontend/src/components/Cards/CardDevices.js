@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 import CardEditDeleteDropdown from 'components/Dropdowns/CardEditDeleteDropdown';
 
@@ -7,6 +7,7 @@ const Devices = ({ color = 'light' }) => {
 
   const [devices, setDevices] = useState([])
 
+  const location = useLocation();
 
   useEffect(() => {
     fetchDevices()
@@ -38,12 +39,14 @@ const Devices = ({ color = 'light' }) => {
                 >
                   Equipos
               </h3>
-                <button
-                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  <Link to="/admin/devices-new">Nuevo Equipo</Link>
-                </button>
+                <Link to={ `/admin/devices-new?last_url=${location.pathname}` }>
+                  <button
+                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Nuevo Equipo
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -85,7 +88,12 @@ const Devices = ({ color = 'light' }) => {
                         { device }
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardEditDeleteDropdown id={ id } table="devices" fetchFunction={ fetchDevices }/>
+                        <CardEditDeleteDropdown
+                          path={ `/admin/devices-new/${ id }?last_url=${location.pathname}` }
+                          id={ id }
+                          table="devices"
+                          fetchFunction={ fetchDevices }
+                        />
                       </td>
                     </tr>
                   )

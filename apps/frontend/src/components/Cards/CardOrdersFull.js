@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { DateTime } from 'luxon';
 import { toast } from 'react-toastify'; 
@@ -11,6 +11,8 @@ import CardOrdersDropdown from "components/Dropdowns/CardOrdersDropdown.js";
 export default function CardOrdersFull({ color }) {
 
   const [orders, setOrders] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     let isMounted = true
@@ -45,7 +47,7 @@ export default function CardOrdersFull({ color }) {
                 >
                   Ordenes de Servicio
                 </h3>
-                <Link to="/admin/order-new">
+                <Link to={`/admin/order-new?last_url=${location.pathname}`}>
                   <button
                     className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
@@ -413,7 +415,7 @@ export default function CardOrdersFull({ color }) {
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
                         <div className="flex justify-center">
                           <img
-                            src={require("assets/img/daniel.jpg")}
+                            src={ require("assets/img/daniel.jpg") }
                             alt="..."
                             className="w-10 h-10 rounded-full border-2 border-g ay-100 shadow"
                           ></img>
@@ -423,7 +425,7 @@ export default function CardOrdersFull({ color }) {
 
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4 text-center">
-                        <CardOrdersDropdown id={id} fetchOrders={fetchOrders} />
+                        <CardOrdersDropdown path={ `/admin/order-new/${id}?last_url=${location.pathname}` } id={id} fetchOrders={fetchOrders} />
                       </td>
                     </tr>
 

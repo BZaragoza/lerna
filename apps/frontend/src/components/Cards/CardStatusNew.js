@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
+import queryString from 'query-string'
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import { simSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
@@ -23,14 +24,16 @@ const CardStatusNew = () => {
 
   // const [toggleShow, setToggleShow] = useState(false)
 
-  // const { register, handleSubmit, setValue, formState: { errors } } = useForm({
   const { register, handleSubmit, setValue, } = useForm({
     // resolver: yupResolver(simSchema)
   });
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
+
+  const { last_url } = queryString.parse( location.search );
 
 
   const onSubmit = (data) => {
@@ -52,7 +55,9 @@ const CardStatusNew = () => {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        history.push("/admin/statuses")
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/statuses')
       })
   }
 
@@ -68,7 +73,9 @@ const CardStatusNew = () => {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/statuses')
       })
   }
 

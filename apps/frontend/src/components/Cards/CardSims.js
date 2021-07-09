@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
 import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardSims({ color }) {
+
+  const location = useLocation();
 
   const [sims, setSims] = useState([]);
 
@@ -40,7 +42,7 @@ export default function CardSims({ color }) {
                 >
                   Compañias 
                 </h3>
-                <Link to="/admin/sim-new">
+                <Link to={ `/admin/sim-new?last_url=${location.pathname}` }>
                   <button
                     className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
@@ -90,7 +92,7 @@ export default function CardSims({ color }) {
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
                         
                         <CardEditDeleteDropdown 
-                          path={ `sim-new/${ id }` }
+                          path={ `sim-new/${ id }?last_url=${location.pathname}` }
                           id={ id }
                           fetchFunction={ fetchSims }
                           table={ "chip" }

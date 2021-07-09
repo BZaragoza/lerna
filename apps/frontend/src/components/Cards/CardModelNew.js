@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import queryString from 'query-string'
 import { yupResolver } from "@hookform/resolvers/yup";
 import { modelSchema } from "schemas/schemas";
+
 import InputBoxForm from "components/Forms/InputBoxForm";
 
 
@@ -12,11 +14,14 @@ export default function CardModelNew() {
     resolver: yupResolver(modelSchema)
   })
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
 
   const [brands, setBrands] = useState([]);
+
+  const { last_url } = queryString.parse( location.search )
 
   console.log(errors)
 
@@ -48,8 +53,10 @@ export default function CardModelNew() {
     })
       .then(res => res.json())
       .then(res => {
-        history.goBack()
         console.log(res)
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/brands-models')
       })
 
   }
@@ -65,8 +72,10 @@ export default function CardModelNew() {
     })
       .then(res => res.json())
       .then(res => {
-        history.goBack()
         console.log(res)
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/brands-models')
       })
   }
 

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
+import queryString from 'query-string'
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import { simSchema } from "schemas/schemas";
 
@@ -14,20 +15,23 @@ const CardSimNew = () => {
     // resolver: yupResolver(simSchema)
   });
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
 
-  console.log(errors)
+  const { last_url } = queryString.parse( location.search )
+
+  // console.log(errors)
 
   const onSubmit = (data) => {
     // console.log(data)
     return isAddMode
-      ? createSim(data)
-      : updateSim(id, data)
+      ? createDevice(data)
+      : updateDevice(id, data)
   }
 
-  const createSim = async (newDevice) => {
+  const createDevice = async (newDevice) => {
 
     try {
       const rawRes = await fetch("/devices", {
@@ -48,7 +52,9 @@ const CardSimNew = () => {
       } else {
 
         console.log(res)
-        return history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/devices' )
 
       }
 
@@ -59,7 +65,7 @@ const CardSimNew = () => {
 
   }
 
-  const updateSim = async (id, newDevice) => {
+  const updateDevice = async (id, newDevice) => {
 
     try {
       const rawRes = await fetch(`/devices/${id}`, {
@@ -80,7 +86,9 @@ const CardSimNew = () => {
       } else {
 
         console.log(res)
-        return history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/devices' )
 
       }
     } catch (err) {
@@ -131,7 +139,7 @@ const CardSimNew = () => {
               </button>
             </div>
           </form>
-          <div className="alert-toast fixed bottom-0 right-0 m-8 w-5/6 md:w-full max-w-sm">
+          <div className="mb-4 mr-4 alert-toast fixed bottom-0 right-0 m-8 w-5/6 md:w-full max-w-sm">
             <input type="checkbox" className="hidden" id="footertoast" />
 
             <label className="close cursor-pointer flex items-start justify-between w-full p-2 bg-green-500 h-24 rounded shadow-lg text-white" title="close">

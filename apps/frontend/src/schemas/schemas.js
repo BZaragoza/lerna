@@ -10,8 +10,7 @@ export const orderSchema = Yup.object().shape({
     client_id: Yup.number().required("Cliente es requerido").positive("Cliente inválido").integer("Cliente inválido"),
     telefono1: Yup.string().required("Teléfono 1 es requerido")
         .matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:true}),
-    telefono2: Yup.string().required("Teléfono 2 es requerido")
-        .matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:true}),
+    telefono2: Yup.string().matches(PHONE_NO_REGEX, {message: "Teléfono inválido", excludeEmptyString:true}).nullable(true),
     
     marca_id: Yup.number().required("Marca es requerida").positive("Marca inválida").integer("Marca inválida"),
     modelo_id: Yup.number().required("Modelo es requerido").positive("Modelo inválido").integer("Modelo inválido"),
@@ -29,11 +28,11 @@ export const orderSchema = Yup.object().shape({
     
     price: Yup.number().required("Precio es requerido").positive("Precio inválido").integer("Precio inválido"),
     anticipo: Yup.number().required("Anticipo es requerido").positive("Anticipo inválido").integer("Anticipo inválido"),
-    remain: Yup.number().typeError("Resta inválida").required("Resta es requerido").positive("Resta inválido").integer("Resta inválido"),
+    remain: Yup.number().typeError("Resta inválida").positive("Verifica tu operación").integer("Resta inválido").required("Resta es requerido"),
     
     pin1: Yup.string().notRequired(),
     pin2: Yup.string().notRequired(),
-    notes: Yup.string().notRequired().min(5, "Nota muy corta"),
+    notes: Yup.string().notRequired().nullable(true),
 });
 
 export const clientSchema = Yup.object().shape({

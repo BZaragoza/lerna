@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { DateTime } from 'luxon';
 
@@ -13,6 +13,8 @@ export default function CardOrdersLite({ color }) {
   const [index, setIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [orders, setOrders] = useState([]);
+  
+  const location = useLocation();
 
   useEffect(() => {
     fetchOrders()
@@ -50,7 +52,7 @@ export default function CardOrdersLite({ color }) {
               </h3>
                 <Link
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  to="/admin/order-new"
+                  to={`/admin/order-new?last_url=${location.pathname}`}
                   type="button"
                 >
                   Nueva Orden
@@ -167,7 +169,7 @@ export default function CardOrdersLite({ color }) {
                         </div>
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4 text-center">
-                        <CardOrdersDropdown order={order} id={order.id} fetchOrders={fetchOrders} />
+                        <CardOrdersDropdown path={ `/admin/order-new/${order.id}?last_url=${location.pathname}` } order={order} id={order.id} fetchOrders={fetchOrders} />
                       </td>
                     </tr>
                   )

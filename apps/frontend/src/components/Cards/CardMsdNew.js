@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
+import queryString from 'query-string'
+
+
 import { msdSchema } from "schemas/schemas";
 import InputBoxForm from "components/Forms/InputBoxForm";
 
@@ -12,9 +15,12 @@ export default function CardSimNew() {
     resolver: yupResolver(msdSchema)
   });
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
+
+  const { last_url } = queryString.parse( location.search )
   
   console.log(errors)
 
@@ -37,7 +43,9 @@ export default function CardSimNew() {
       .then( res => res.json() )
       .then( res => { 
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/sim-msd')
       })
   }
 
@@ -53,7 +61,9 @@ export default function CardSimNew() {
       .then( res => res.json() )
       .then( res => { 
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/sim-msd')
       })
   }
 

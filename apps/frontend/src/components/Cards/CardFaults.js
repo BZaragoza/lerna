@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from "react";
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
@@ -9,6 +9,8 @@ import CardEditDeleteDropdown from 'components/Dropdowns/CardEditDeleteDropdown'
 export default function CardFaults({ color }) {
 
   const [faults, setFaults] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     fetchFaults();
@@ -41,7 +43,7 @@ export default function CardFaults({ color }) {
                 >
                   Fallas
               </h3>
-                <Link to="/admin/fault-new">
+                <Link to={`/admin/fault-new?last_url=${ location.pathname }`}>
                   <button
                     className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
@@ -104,7 +106,7 @@ export default function CardFaults({ color }) {
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
                        
                         <CardEditDeleteDropdown
-                          path={ `fault-new/${ id }` }
+                          path={ `fault-new/${ id }?last_url=${location.pathname}` }
                           id={ id }
                           fetchFunction={ fetchFaults }
                           table={ "fallas" }

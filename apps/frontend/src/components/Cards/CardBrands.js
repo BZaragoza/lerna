@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { Link, useLocation } from 'react-router-dom';
 import PropTypes from "prop-types";
 
 // components
-import { Link } from "react-router-dom";
 import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
 
 export default function CardBrands({ color }) {
 
   const [brands, setBrands] = useState([]);
+
+  const location = useLocation();
+
   useEffect(() => {
     fetchBrands()
   }, [])
@@ -38,12 +41,14 @@ export default function CardBrands({ color }) {
                 >
                   Marcas
               </h3>
-                <button
-                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  <Link to="/admin/brand-new">Nueva Marca</Link>
-            </button>
+                <Link to={`/admin/brand-new?last_url=${location.pathname}`}>
+                  <button
+                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Nueva Marca
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -86,7 +91,7 @@ export default function CardBrands({ color }) {
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
 
                         <CardEditDeleteDropdown
-                          path={ `marcas-new/${ id }` }
+                          path={ `brand-new/${ id }?last_url=${location.pathname}` }
                           id={ id }
                           fetchFunction={ fetchBrands }
                           table={"marcas"}

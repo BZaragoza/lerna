@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import CardEditDeleteDropdown from '../Dropdowns/CardEditDeleteDropdown'
 
 
 const CardStatus = ({ color = 'light' }) => {
 
-  const [statuses, setStatuses] = useState([])
+  const location = useLocation();
 
+  const [statuses, setStatuses] = useState([]);
 
   useEffect(() => {
     fetchStatus()
@@ -38,13 +39,21 @@ const CardStatus = ({ color = 'light' }) => {
                   }
                 >
                   Estados
-              </h3>
-                <button
+                </h3>
+                <Link to={`/admin/status-new?last_url=${location.pathname}`}>
+                  <button
+                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Nuevo Estado
+                  </button>
+                </Link>
+                {/* <button
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                   type="button"
                 >
-                  <Link to="/admin/status-new">Nuevo Estado</Link>
-                </button>
+                  <Link to={`/admin/status-new?last_url=${location.pathname}`}>Nuevo Estado</Link>
+                </button> */}
               </div>
             </div>
           </div>
@@ -72,7 +81,7 @@ const CardStatus = ({ color = 'light' }) => {
                       : "bg-blue-800 text-blue-300 border-blue-700")
                   }
                 >
-                  Color 
+                  Color
                 </th>
                 <th
                   className={
@@ -89,20 +98,25 @@ const CardStatus = ({ color = 'light' }) => {
             <tbody>
 
               {
-                statuses.map( ({ status, id }) => {
+                statuses.map(({ status, id, color }) => {
                   return (
-                    <tr key={ id }>
+                    <tr key={id}>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { status }
+                        {status}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
                         <div className={ color } style={{
-                          width:'50px',
-                          height:'20px',
+                          width: '50px',
+                          height: '20px',
                         }}></div>
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-                        <CardEditDeleteDropdown path={ `/admin/status-new/${ id }` }  id={ id } table="status" fetchFunction={ fetchStatus }/>
+                        <CardEditDeleteDropdown 
+                          path={`/admin/status-new/${id}?last_url=${location.pathname}`} 
+                          id={id} 
+                          table="status" 
+                          fetchFunction={ fetchStatus } 
+                        />
                       </td>
                     </tr>
                   )

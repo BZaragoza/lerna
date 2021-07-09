@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import queryString from 'query-string'
+
 import { yupResolver } from "@hookform/resolvers/yup"
 import { solutionSchema } from "../../schemas/schemas";
 
@@ -14,11 +16,14 @@ export default function CardSolutionNew() {
     resolver: yupResolver(solutionSchema)
   })
 
+  const location = useLocation();
   const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
 
   const [faults, setFaults] = useState([]);
+
+  const { last_url } = queryString.parse( location.search )
 
   console.log(errors);
 
@@ -42,7 +47,9 @@ export default function CardSolutionNew() {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/faults-solutions')
       })
 
   }
@@ -59,7 +66,9 @@ export default function CardSolutionNew() {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/faults-solutions')
       })
   }
 
@@ -93,7 +102,7 @@ export default function CardSolutionNew() {
           </div>
         </div>
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={ handleSubmit(onSubmit) }>
             <div className="flex flex-wrap mt-6">
 
               <div className="w-full px-4">
@@ -104,11 +113,11 @@ export default function CardSolutionNew() {
                   >
                     Falla
                   </label>
-                  <select defaultValue={null} {...register("falla_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                  <select defaultValue={null} { ...register("falla_id") } className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                     <option value={null}></option>
                     {
                       faults.map(({ id, falla }) => {
-                        return <option key={falla} value={parseInt(id)}>{falla}</option>
+                        return <option key={falla} value={parseInt(id)}>{ falla }</option>
                       })
                     }
                   </select>

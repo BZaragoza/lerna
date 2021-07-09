@@ -21,7 +21,7 @@ export default function CardEditDeleteDropdown ({ table, id, fetchFunction, path
   const deleteClient = (e) => {
     e.preventDefault();
 
-    fetch(`http://localhost:8080/${table}/${id}`, {
+    fetch(`/${table}/${id}`, {
       method: 'DELETE'
     })
       .then(res => res.json())

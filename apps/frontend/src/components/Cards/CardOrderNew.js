@@ -1,11 +1,15 @@
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import { useForm, Controller } from "react-hook-form";
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useLocation, useParams } from "react-router-dom";
 import { DateTime } from 'luxon';
+import queryString from 'query-string'
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import { orderSchema } from "schemas/schemas";
+
 import InputBoxForm from "components/Forms/InputBoxForm";
 
 const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -18,26 +22,34 @@ registerLocale("es", {
   }
 });
 
-const CardOrderNew2 = () => {
+const CardOrderNew = () => {
 
+  const inputRef = useRef(null)
+
+  const location = useLocation();
+  const history = useHistory();
   const { id } = useParams();
   const isAddMode = !id;
+
+  const { last_url } = queryString.parse( location.search )
 
   const defaultValues = {
     receptionDate: DateTime.now().toJSDate(),
     deadlineDate: DateTime.now().set({ hour: 17, minute: 0 }).plus({ days: 1 }).toJSDate(),
-    dejo: false,
-    encendido: false,
-    battery: false,
+    dejo: true,
+    encendido: true,
+    battery: true,
     charger: false,
     status_id: null,
   }
 
 
-  const { register, handleSubmit, setValue, getValues, watch, control } = useForm({
+  const { register, handleSubmit, setValue, getValues, watch, control, formState: { errors } } = useForm({
     // resolver: yupResolver(orderSchema),
     defaultValues,
   })
+
+  console.log(errors)
 
   const [msd, setMsd] = useState([]);
   const [chip, setChip] = useState([]);
@@ -92,7 +104,7 @@ const CardOrderNew2 = () => {
       .then(res => res.json())
       .then(({ folio }) => setValue("folio", folio))
 
-      fetch("/technician")
+    fetch("/technician")
       .then(res => res.json())
       .then(({ res }) => setTechnicians(res))
 
@@ -100,7 +112,7 @@ const CardOrderNew2 = () => {
   }, [setValue]);
 
   const onSubmit = (data) => {
-    
+
     delete data.models
     delete data.solutions
     data.remain = data.price - data.anticipo
@@ -111,10 +123,10 @@ const CardOrderNew2 = () => {
 
 
     console.log(data)
-    // return isAddMode
-    return createOrder(data)
-    // ? createOrder(data)
-    // : updateOrder(id, data)
+    // return createOrder(data)
+    return isAddMode
+      ? createOrder(data)
+      : updateOrder(id, data)
   }
 
   const createOrder = (newOrder) => {
@@ -129,7 +141,27 @@ const CardOrderNew2 = () => {
       .then(res => res.json())
       .then(res => {
         console.log(res)
-        // history.goBack()
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/orders')
+      })
+  }
+
+  const updateOrder = (id, newOrder) => {
+    fetch(`/orden/${id}`, {
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newOrder)
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        return last_url
+          ? history.push( last_url )
+          : history.push( '/admin/orders')
       })
   }
 
@@ -140,6 +172,7 @@ const CardOrderNew2 = () => {
   const anticipo = watch("anticipo");
   const client_id = watch("client_id");
   const marca_id = watch("marca_id");
+  const modelo_id = watch("modelo_id");
   const falla_id = watch("falla_id");
 
   useEffect(() => {
@@ -168,6 +201,29 @@ const CardOrderNew2 = () => {
     setValue("solutions", solutionsFiltered)
   }
 
+  useEffect(() => {
+    if (!isAddMode) {
+      fetch(`/orden/${id}`)
+        .then(res => res.json())
+        .then(({ query }) => {
+
+          const fields = [
+            'folio', 'receptionDate', 'deadlineDate', 'status_id', 'device_id', 'technician_id', 'client_id', 'telefono1', 'telefono2',
+            'marca_id', 'modelo_id', 'dejo', 'encendido', 'falla_id', 'solucion_id', 'battery', 'chip', 'msd', 'charger',
+            'pin1', 'pin2', 'price', 'anticipo', 'remain', 'notes'
+          ];
+          fields.map(field => setValue(field, query[field]));
+
+        });
+    }
+  }, [isAddMode, id, setValue]);
+
+
+  useEffect(() => {
+    handleModelsChange()
+    handleSolutionsChange()
+  }, [modelo_id, falla_id])
+
   return (
     <div className="">
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-gray-200 border-0">
@@ -190,11 +246,11 @@ const CardOrderNew2 = () => {
 
               <div className="w-full lg:w-4/12 px-4">
                 <div className="relative w-full mb-3">
-                  
+
                   <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Fecha Recepcion
                   </label>
-                  
+
                   <Controller
                     name={"receptionDate"}
                     control={control}
@@ -230,7 +286,7 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-4/12 px-4">
                 <div className="relative w-full mb-3">
-                  
+
                   <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Fecha a Entregar
                   </label>
@@ -283,7 +339,10 @@ const CardOrderNew2 = () => {
                     return (
                       <select
                         // defaultValue={ Number(defaultStatus?.id) }
-                        onClick={handleClientsChange}
+                        onClick={() => {
+                          handleClientsChange()
+                          forceUpdate()
+                        }}
                         // onChange={onChange}
                         // value={value}
                         {...register("status_id")}
@@ -316,7 +375,7 @@ const CardOrderNew2 = () => {
 
                     return (
                       <select
-                        defaultValue={ Number(defaultDevice?.id) || null }
+                        defaultValue={Number(defaultDevice?.id) || null}
                         onClick={handleClientsChange}
                         {...register("device_id")}
                         className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
@@ -347,8 +406,11 @@ const CardOrderNew2 = () => {
                   (() => {
                     return (
                       <select
-                        defaultValue={ null }
-                        onClick={handleClientsChange}
+                        defaultValue={null}
+                        onClick={() => {
+                          handleClientsChange()
+                          forceUpdate()
+                        }}
                         {...register("technician_id")}
                         className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
@@ -359,7 +421,7 @@ const CardOrderNew2 = () => {
                             // .filter((device) => !device.device.toLowerCase().includes('tel'))
                             .map(({ id, name }) => {
                               return (
-                                <option key={id} value={Number(id)} >{ name }</option>
+                                <option key={id} value={Number(id)} >{name}</option>
                               )
                             })
                         }
@@ -373,12 +435,12 @@ const CardOrderNew2 = () => {
 
             </div>
 
-            
-            
+
+
             <hr className="mt-6 border-b-1 border-gray-400" />
             <h6 className="text-gray-500 text-sm mt-3 mb-6 font-bold uppercase flex justify-between">
               Informacion Cliente
-              <Link to="/admin/client-new">
+              <Link to={`/admin/client-new?last_url=${location.pathname}`}>
                 <button
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                   type="button"
@@ -396,7 +458,7 @@ const CardOrderNew2 = () => {
                   >
                     Cliente
                   </label>
-                  {/* <Controller
+                  <>{/* <Controller
                     name="client_id"
                     control={control}
                     render={({ field: { onChange, value } }) => {
@@ -417,13 +479,17 @@ const CardOrderNew2 = () => {
                         </select>
                       )
                     }}
-                  /> */}
+                  /> */}</>
                   {
                     (() => {
                       return (
                         <select
-                          onClick={handleClientsChange}
+                          onClick={() => {
+                            handleClientsChange()
+                            forceUpdate()
+                          }}
                           {...register("client_id")}
+
                           className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                         >
                           <option defaultValue={null}>{ }</option>
@@ -441,7 +507,7 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-3/12 px-4">
                 <div className="relative w-full mb-3">
-                  
+
                   <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Telefono 1
                   </label>
@@ -466,7 +532,7 @@ const CardOrderNew2 = () => {
               </div>
               <div className="w-full lg:w-3/12 px-4">
                 <div className="relative w-full mb-3">
-                  
+
                   <label className="block uppercase text-gray-700 text-xs font-bold mb-2" >
                     Telefono 2
                   </label>
@@ -493,7 +559,7 @@ const CardOrderNew2 = () => {
 
             <h6 className="text-gray-500 text-sm mt-3 mb-6 font-bold uppercase flex justify-between">
               Informacion Equipo
-              <Link to="/admin/brand-new">
+              <Link to={`/admin/brand-new?last_url=${location.pathname}`}>
                 <button
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                   type="button"
@@ -501,7 +567,7 @@ const CardOrderNew2 = () => {
                   Nueva Marca
                 </button>
               </Link>
-              <Link to="/admin/model-new">
+              <Link to={`/admin/model-new?last_url=${location.pathname}`}>
                 <button
                   className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                   type="button"
@@ -519,40 +585,11 @@ const CardOrderNew2 = () => {
                   >
                     Marca
                   </label>
-                  {/* <Controller
-                    name={"marca_id"}
-                    control={control}
-                    render={({ field: { onChange, value } }) => {
-                      return (
-                        <select
-                          onChange={onChange}
-                          onClick={() => {
-                            handleModelsChange()
-                            forceUpdate()
-                          }}
-                          value={value}
-                          {...register("marca_id")}
-                          className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
-                        >
-                          <option defaultValue={null}></option>
-                          {
-                            brands.map(({ marca, id }) => {
-                              return <option
-                                key={marca}
-                                value={parseInt(id, 10)}
-                                onClick={() => setValue("marca_id", id)}
-                              >{marca}</option>
-                            })
-                          }
-                        </select>
-                      )
-                    }
-                    }
-                  /> */}
                   {
                     (() => {
                       return (
                         <select
+                          ref={inputRef}
                           onClick={() => {
                             handleModelsChange()
                             forceUpdate()
@@ -592,15 +629,12 @@ const CardOrderNew2 = () => {
                       <select
                         onChange={onChange}
                         value={String(value)}
-                        className="uppercase  px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                        className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
                       >
                         <option defaultValue={null}></option>
                         {
                           getValues("models")?.map(({ id, modelo }) => {
                             return (<option
-
-                              // onClick={() => setValue("modelo_id", Number(id))}
-                              onClick={() => console.log(id)}
                               key={modelo}
                               value={id}
                             >
@@ -615,37 +649,48 @@ const CardOrderNew2 = () => {
                     )
                   }}
                 />
-                {/* <Controller
-                  name={"modelo_id"}
+              </div>
+
+              <div className="w-full lg:w-3/12 px-4">
+                <label
+                  className="block uppercase text-gray-700 text-xs font-bold mb-2"
+                  htmlFor="grid-password"
+                >
+                  Modelo Numérico
+                </label>
+                <Controller
+                  name="modelo_num_id"
                   control={control}
-                  render={({ field: { onChange, value } }) => {
-                    return <select
-                      onChange={onChange}
-                      onClick={() => {
-                        
-                      }}
-                      {...register("modelo_id")}
-                      value={value}
-                      className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                      <option defaultValue={null}></option>
-                      {
-                        getValues("models")?.map(({ id, modelo }) =>{
-                          console.log(id, modelo)
-                          return (<option
-                            onClick={() => setValue("modelo_id", id)}
-                            key={modelo}
-                            value={id}
-                          >
-                            {
-                              modelo
-                            }
-                          </option> )}
-                        )
-                      }
-                    </select>
-                  }
-                  }
-                /> */}
+                  render={({ field: { onChange, value = null } }) => {
+
+                    return (
+                      <select
+                        onChange={onChange}
+                        className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150"
+                      >
+                        <option defaultValue={ null }></option>
+                        {
+                          getValues("models")?.map(modelo => {
+
+                            // if (modelo.id === modelo_id) {
+                              return (
+                                <option
+                                  
+                                  key={modelo.modelo_num}
+                                  defaultValue={modelo.id}
+                                >
+                                  {
+                                    modelo.modelo_num
+                                  }
+                                </option>
+                              )
+                            // }
+                          })
+                        }
+                      </select>
+                    )
+                  }}
+                />
               </div>
 
               <div className="w-full lg:w-3/12 px-4 mt-2">
@@ -699,7 +744,7 @@ const CardOrderNew2 = () => {
               <div className="w-full lg:w-6/12 px-4">
                 <h6 className="text-gray-500 text-sm mt-3 mb-6 font-bold uppercase flex justify-between">
                   Posibles Fallas
-                  <Link to="/admin/fault-new">
+                  <Link to={`/admin/fault-new?last_url=${location.pathname}`}>
                     <button
                       className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                       type="button"
@@ -707,7 +752,7 @@ const CardOrderNew2 = () => {
                       Nueva Falla
                     </button>
                   </Link>
-                  <Link to="/admin/solution-new">
+                  <Link to={`/admin/solution-new?last_url=${location.pathname}`}>
                     <button
                       className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                       type="button"
@@ -730,6 +775,7 @@ const CardOrderNew2 = () => {
 
                       return (
                         <select
+                          // ref={ inputRef }
                           onChange={onChange}
                           onClick={() => {
                             handleSolutionsChange()
@@ -786,15 +832,6 @@ const CardOrderNew2 = () => {
                       )
                     }}
                   />
-                  {/* <select {...register("solucion_id", {  })} className="px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                    <option defaultValue={null}></option>
-                    {
-                      solutions?.filter((solution) => solution.falla_id === parseInt(getValues("falla_id")))
-                      .map( ({ id, solucion }) => {
-                        return <option key={ solucion } value={ id }>{ solucion }</option>
-                      })
-                    }
-                  </select> */}
                 </div>
               </div>
 
@@ -896,7 +933,7 @@ const CardOrderNew2 = () => {
                 register={register}
                 label="Pin o Patron 2"
                 input="pin2"
-                // required
+              // required
               />
             </div>
 
@@ -958,4 +995,4 @@ const CardOrderNew2 = () => {
   );
 }
 
-export default CardOrderNew2
+export default CardOrderNew

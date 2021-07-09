@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PropTypes from "prop-types";
 
 // components
@@ -8,7 +8,8 @@ import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown"
 export default function CardClients({ color = 'light' }) {
 
   const [clients, setClients] = useState([]);
-  
+
+  const location = useLocation();
 
   useEffect(() => {
     fetchClients()
@@ -40,13 +41,15 @@ export default function CardClients({ color = 'light' }) {
                   }
                 >
                   Clientes
-              </h3>
-                <button
-                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  <Link to="/admin/client-new">Nuevo Cliente</Link>
-                </button>
+                </h3>
+                <Link to={`/admin/client-new?last_url=${location.pathname}`}>
+                  <button
+                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Nuevo Cliente
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -131,33 +134,33 @@ export default function CardClients({ color = 'light' }) {
             <tbody>
 
               {
-                clients.map( ({ id, nombre, apellido_paterno, apellido_materno, telefono1, telefono2, notas, }) => {
+                clients.map(({ id, nombre, apellido_paterno, apellido_materno, telefono1, telefono2, notas, }) => {
                   return (
-                    <tr key={ id }>
+                    <tr key={id}>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { nombre }
+                        {nombre}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        { apellido_paterno }
+                        {apellido_paterno}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { apellido_materno }
+                        {apellido_materno}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { telefono1 }
+                        {telefono1}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { telefono2 }
+                        {telefono2}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        { notas }
+                        {notas}
                       </td>
                       <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
 
                         <CardEditDeleteDropdown
-                          path={ `client-new/${  id  }` }
-                          id={  id  }
-                          fetchFunction={ fetchClients }
+                          path={`client-new/${id}?last_url=${location.pathname}`}
+                          id={id}
+                          fetchFunction={fetchClients}
                           table={"clientes"}
                         />
 
