@@ -11,7 +11,8 @@ import InputBoxForm from "components/Forms/InputBoxForm";
 
 const CardSimNew = () => {
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+  // const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, } = useForm({
     // resolver: yupResolver(simSchema)
   });
 

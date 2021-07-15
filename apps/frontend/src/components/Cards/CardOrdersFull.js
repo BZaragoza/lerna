@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
 import { DateTime } from 'luxon';
-import { toast } from 'react-toastify'; 
 
 // components
 
 import CardOrdersDropdown from "components/Dropdowns/CardOrdersDropdown.js";
+import NotificationDropdown from 'components/Dropdowns/NotificationDropdown';
+import OrderTable from "components/Table/OrderTable"
 
 export default function CardOrdersFull({ color }) {
 
   const [orders, setOrders] = useState([]);
+  const [prefilteredOrders, setPrefilteredOrders] = useState([])
+
+  useEffect(() => {
+    setPrefilteredOrders([...orders])
+  }, [orders])
 
   const location = useLocation();
 
   useEffect(() => {
     let isMounted = true
-    if ( isMounted ) fetchOrders()
+    if (isMounted) fetchOrders()
 
     return () => { isMounted = false }
   }, []);
@@ -27,423 +32,239 @@ export default function CardOrdersFull({ color }) {
       .then(({ res }) => setOrders(res))
   }
 
-  return (
-    <>
-      <div
-        className={
-          "relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded " +
-          (color === "light" ? "bg-white" : "bg-blue-900 text-white")
+  const filterStatusOrders = (rows, id, filterValue) => {
+    return rows.filter(row => row.original.col3 === filterValue)
+  }
+
+  filterStatusOrders.autoRemove = val => typeof val !== 'string'
+
+  const filterTechniciansOrders =  (rows, id, filterValue) => {
+    return rows.filter(row => row.original.col23 === filterValue)
+  }
+
+  filterTechniciansOrders.autoRemove = val => typeof val !== 'string'
+  
+  const getInfoToGeneralCells = ( orders, status, folio ) => {
+    
+    let color, id;
+    orders.map( order => {
+      if (order.status === status && order.folio === folio) {
+        color = order.color
+        id = order.id
+      }
+    })
+
+    return [color, id] 
+  }
+
+  const columns = useMemo(
+    () => [
+      {
+        Header: 'Fecha Entrada',
+        accessor: 'col1', // accessor is the "key" in the data
+      },
+      {
+        Header: 'Folio',
+        accessor: 'col2',
+      },
+      {
+        Header: 'Estado',
+        accessor: 'col3',
+        filter: filterStatusOrders,
+        Cell: (props) => {
+
+          const [ color, id ] = getInfoToGeneralCells(orders, props.cell.value, props.cell.row.original.col2 )
+
+          return <div onClick={ e => e.stopPropagation() }>
+          <NotificationDropdown fetchOrders={fetchOrders} orderId={id} >
+            <span className={color + " text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"} >
+              {props.cell.value}
+            </span>
+          </NotificationDropdown>
+        </div>;
         }
-      >
-        <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <div className="flex justify-between">
-                <h3
-                  className={
-                    "font-semibold text-lg" +
-                    (color === "light" ? "text-gray-800" : "text-white")
-                  }
+      },
+      {
+        Header: 'Cliente',
+        accessor: 'col4',
+      },
+      {
+        Header: 'Teléfono',
+        accessor: 'col5',
+      },
+      {
+        Header: 'Teléfono 2',
+        accessor: 'col6',
+      },
+      {
+        Header: 'Dispositivo',
+        accessor: 'col7',
+      },
+      {
+        Header: 'Equipo',
+        accessor: 'col8',
+      },
+      {
+        Header: 'Dejo',
+        accessor: 'col9',
+      },
+      {
+        Header: 'Falla',
+        accessor: 'col10',
+      },
+      {
+        Header: 'A Realizar',
+        accessor: 'col11',
+      },
+      {
+        Header: 'Bateria',
+        accessor: 'col12',
+      },
+      {
+        Header: 'Chip',
+        accessor: 'col13',
+      },
+      {
+        Header: 'MSD',
+        accessor: 'col14',
+      },
+      {
+        Header: 'Cargador',
+        accessor: 'col15',
+      },
+      {
+        Header: 'Precio',
+        accessor: 'col16',
+      },
+      {
+        Header: 'Abono',
+        accessor: 'col17',
+      },
+      {
+        Header: 'Resta',
+        accessor: 'col18',
+      },
+      {
+        Header: 'Fecha Entrega',
+        accessor: 'col19',
+      },
+      {
+        Header: 'PIN o Patron 1',
+        accessor: 'col20',
+      },
+      {
+        Header: 'PIN o Patron 2',
+        accessor: 'col21',
+      },
+      {
+        Header: 'Notas',
+        accessor: 'col22',
+      },
+      {
+        // Header: 'Notas del  Tecnico',
+        Header: 'Tecnico',
+        accessor: 'col23',
+        filter: filterTechniciansOrders,
+      },
+      {
+        Header: 'Editar',
+        accessor: 'col24',
+        disableFilters: true,
+      },
+    ], [orders]);
+
+  const data = useMemo(() => {
+
+    const ordersFiltered = prefilteredOrders?.map(({ id, receptionDate, folio, status, color, nombre,
+      apellido_paterno, apellido_materno, telefono1, telefono2, device, marca, modelo, modelo_num,
+      dejo, falla, solucion, battery, compañia, capacidad, charger, price, anticipo, remain,
+      deadlineDate, pin1, pin2, notes, technician
+    }) => (
+
+      {
+        col1: DateTime.fromMillis(receptionDate).toLocaleString(DateTime.DATETIME_MED),
+        col2: folio,
+        // col3: <div onClick={ e => e.stopPropagation() }>
+        //         <NotificationDropdown fetchOrders={fetchOrders} orderId={id} >
+        //           <span className={color + " text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"} >
+        //             {status}
+        //           </span>
+        //         </NotificationDropdown>
+        //       </div>,
+        col3: status,
+        col4: `${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase(),
+        col5: telefono1,
+        col6: telefono2,
+        col7: device.toUpperCase(),
+        col8: `${marca} ${modelo} ( ${modelo_num} )`.toUpperCase(),
+        col9: dejo ? "SI" : "NO",
+        col10: `${falla}`.toUpperCase(),
+        col11: `${solucion}`.toUpperCase(),
+        col12: battery ? "SI" : "NO",
+        col13: `${compañia}`.toUpperCase(),
+        col14: capacidad === 0 ? 'NO' : `${capacidad} GB`.toUpperCase(),
+        col15: charger ? "SI" : "NO",
+        col16: `$ ${price}`,
+        col17: `$ ${anticipo}`,
+        col18: `$ ${remain}`,
+        col19: DateTime.fromMillis(deadlineDate).toLocaleString(DateTime.DATETIME_MED),
+        col20: `${pin1}`.toUpperCase(),
+        col21: pin2 ? `${pin2}`.toUpperCase() : "",
+        col22: `${notes}`.toUpperCase(),
+        // col22: `${notes}`.toUpperCase(),
+        col23: `${ technician }`,
+        // col23: <div className="flex justify-center">
+        //   <img
+        //     src={require("assets/img/daniel.jpg")}
+        //     alt="..."
+        //     className="w-10 h-10 rounded-full border-2 border-g ay-100 shadow"
+        //   ></img>
+        // </div>,
+        col24: <CardOrdersDropdown
+          path={`/admin/order-new/${id}?last_url=${location.pathname}`}
+          id={id}
+          fetchOrders={fetchOrders}
+        />
+      }
+
+    ))
+
+    return ordersFiltered
+  }, [location.pathname, prefilteredOrders])
+
+  return (
+    <OrderTable 
+      techColumn='col23'
+      statusColumn='col3'
+      orders={ orders } 
+      setPrefilteredOrders={ setPrefilteredOrders }
+      columns={ columns } 
+      data={ data }
+    >
+      <div className="rounded-t mb-0 px-4 py-3 border-0">
+        <div className="flex flex-wrap items-center">
+          <div className="relative w-full px-4 max-w-full flex-grow flex-1">
+            <div className="flex justify-between">
+              <h3
+                className={
+                  "font-semibold text-lg" +
+                  (color === "light" ? "text-gray-800" : "text-white")
+                }
+              >
+                Ordenes de Servicio
+              </h3>
+              <Link to={`/admin/order-new?last_url=${location.pathname}`}>
+                <button
+                  className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                  type="button"
                 >
-                  Ordenes de Servicio
-                </h3>
-                <Link to={`/admin/order-new?last_url=${location.pathname}`}>
-                  <button
-                    className="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    Nueva Orden
-                  </button>
-                </Link>
-              </div>
+                  Nueva Orden
+                </button>
+              </Link>
             </div>
           </div>
         </div>
-        <div className="block w-full overflow-x-auto">
-          {/* Projects table */}
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Fecha Entrada
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Folio
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Estado
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Cliente
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Telefono
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Telefono 2
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Dispositivo
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Equipo
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Dejo
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Falla
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  A Realizar
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Bateria
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Chip
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  MSD
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Cargador
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Precio
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Abono
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Resta
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Fecha Entrega
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  PIN o Patron 1
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  PIN o Patron 2
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Notas
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Tecnico
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Notas del Tecnico
-                </th>
-                <th
-                  className={
-                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Editar
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                orders.map(order => {
-                  let {
-                    id, receptionDate, folio, nombre, apellido_paterno, apellido_materno, telefono1,
-                    telefono2, marca, modelo, dejo, falla, solucion, battery, compañia, capacidad,
-                    charger, price, anticipo, remain, deadlineDate, pin1, pin2, notes, status, color, device
-                  } = order;
-                   
-                  return (
-                    <tr onClick={ () => toast.success('Have fun storming the castle!', 'Miracle Max Says') }  key={id}>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {DateTime.fromMillis(receptionDate).toLocaleString(DateTime.DATETIME_MED)}
-                        {/* { DateTime.now().toLocaleString(DateTime.DATETIME_MED) } */}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        <p>{folio}</p>
-                      </td>
-                      
-                      
-                      
-                      
-                      {/* 
-                      
-                        ToDo: Estado clickeable
-                        
-                      */}
-                      
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        <span className={ color + " text-xs font-semibold inline-block py-1 px-2 uppercase rounded  uppercase last:mr-0 mr-1"}>
-                        {`${status || ""}`.toUpperCase()}
-                        </span>
-                      </td>
-
-
-
-
-
-
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {telefono1}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {telefono2}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        { device.toUpperCase() }
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${marca} ${modelo}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {dejo ? "SI" : "NO"}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${falla}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${solucion}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {battery ? "SI" : "NO"}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${compañia}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {capacidad === 0 ? 'NO' : `${capacidad} GB`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {charger ? "SI" : "NO"}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`$ ${price}`}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`$ ${anticipo}`}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`$ ${remain}`}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {DateTime.fromMillis(deadlineDate).toLocaleString(DateTime.DATETIME_MED)}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${pin1}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {pin2 ? `${pin2}`.toUpperCase() : ""}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        {`${notes}`.toUpperCase()}
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-                        <div className="flex justify-center">
-                          <img
-                            src={ require("assets/img/daniel.jpg") }
-                            alt="..."
-                            className="w-10 h-10 rounded-full border-2 border-g ay-100 shadow"
-                          ></img>
-                        </div>
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4">
-
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-no-wrap p-4 text-center">
-                        <CardOrdersDropdown path={ `/admin/order-new/${id}?last_url=${location.pathname}` } id={id} fetchOrders={fetchOrders} />
-                      </td>
-                    </tr>
-
-                  )
-                })
-              }
-            </tbody>
-          </table>
-        </div>
       </div>
-    </>
-  );
-}
-
-CardOrdersFull.defaultProps = {
-  color: "light",
-};
-
-CardOrdersFull.propTypes = {
-  color: PropTypes.oneOf(["light", "dark"]),
+    </OrderTable>
+  )
 };

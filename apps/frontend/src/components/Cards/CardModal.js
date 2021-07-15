@@ -32,13 +32,13 @@ export default function Modal({ showModal, setShowModal, order }) {
                 <div className="container px-4 mx-auto">
                   <div className="flex flex-wrap">
 
-                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                    <div className="w-1/2 px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
                         <strong>Folio:</strong> { order?.folio }
                       </p>
                     </div>
 
-                    <div className="w-full px-4 md:w-6/12 md:flex-none">
+                    <div className="w-1/2 px-4 md:w-6/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
                         <strong>Fecha Entrada:</strong> {DateTime.fromMillis(order?.receptionDate).toLocaleString(DateTime.DATETIME_MED)}
                       </p>
@@ -70,10 +70,10 @@ export default function Modal({ showModal, setShowModal, order }) {
                     </div>
                     <div className="w-full px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
-                        <strong>Equipo:</strong> {`${order?.marca} ${order?.modelo}`.toUpperCase()}
+                        <strong>Equipo:</strong> {`${order?.marca} ${order?.modelo} ( ${ order?.modelo_num } )`.toUpperCase()}
                       </p>
                     </div>
-                    <div className="w-full px-4 md:w-4/12 md:flex-none">
+                    <div className="w-6/12 px-4 md:w-4/12 md:flex-none">
                       <p className="my-4 text-gray-600 text-lg leading-relaxed">
                         <strong>Dejo:</strong> {order?.dejo ? "SI" : "NO"}
                       </p>

@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from 'react-router-dom';
-import PropTypes from "prop-types";
 
 // components
-
 import CardEditDeleteDropdown from "components/Dropdowns/CardEditDeleteDropdown";
+import Table from "components/Table/Table";
 
-export default function CardModels({ color }) {
+export default function CardModels({ color="light" }) {
 
   const [models, setModels] = useState([]);
-
   const location = useLocation();
 
   useEffect(() => {
@@ -22,15 +20,47 @@ export default function CardModels({ color }) {
       .then(({ res }) => setModels(res))
   }
 
+  const columns = useMemo(
+    () => [
+      {
+        Header: 'Marca',
+        accessor: 'col1', // accessor is the "key" in the data
+      },
+      {
+        Header: 'Modelo',
+        accessor: 'col2', // accessor is the "key" in the data
+      },
+      {
+        Header: 'Modelo Num',
+        accessor: 'col3', // accessor is the "key" in the data
+      },
+      {
+        Header: 'Editar',
+        accessor: 'col4',
+        disableFilters: true,
+      },
+    ], []);
+
+  const data = useMemo(() => {
+
+    const modelsFiltered = models.map(({ id, marca, modelo, modelo_num }) => ({
+      col1: marca,
+      col2: modelo,
+      col3: modelo_num,
+      col4: <CardEditDeleteDropdown
+        path={`/admin/model-new/${id}?last_url=${location.pathname}`}
+        id={ id }
+        table="marcas"
+        fetchFunction={ fetchModels }
+      />
+    }))
+
+    return modelsFiltered
+  }, [ models, location.pathname ])
+
   return (
-    <>
-      <div
-        className={
-          "relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded " +
-          (color === "light" ? "bg-white" : "bg-blue-900 text-white")
-        }
-      >
-        <div className="rounded-t mb-0 px-4 py-3 border-0">
+    <Table columns={columns} data={data}>
+      <div className="rounded-t mb-0 px-4 py-3 border-0">
           <div className="flex flex-wrap items-center">
             <div className="relative w-full px-4 max-w-full flex-grow flex-1">
               <div className="flex justify-between">
@@ -54,94 +84,6 @@ export default function CardModels({ color }) {
             </div>
           </div>
         </div>
-        <div className="block w-full overflow-x-auto">
-          {/* Projects table */}
-          <table className="items-center w-full bg-transparent border-collapse">
-            <thead>
-              <tr>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Marca
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Modelo
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-left " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  M Numerico
-                </th>
-                <th
-                  className={
-                    "px-3 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-no-wrap font-semibold text-center " +
-                    (color === "light"
-                      ? "bg-gray-100 text-gray-600 border-gray-200"
-                      : "bg-blue-800 text-blue-300 border-blue-700")
-                  }
-                >
-                  Editar
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                models.map(({ id, modelo, modelo_num, marca }) => {
-                  return (
-                    <tr key={id}>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4">
-                        {marca}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {modelo}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-normal p-4">
-                        {modelo_num}
-                      </td>
-                      <td className="border-t-0 px-3 align-middle border-l-0 border-r-0 text-xs uppercase whitespace-no-wrap p-4 text-center">
-
-                        <CardEditDeleteDropdown
-                          path={`model-new/${id}?last_url=${ location.pathname }`}
-                          id={id}
-                          fetchFunction={fetchModels}
-                          table={"modelos"}
-                        />
-
-                      </td>
-                    </tr>
-                  )
-                })
-
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </>
+    </Table>
   );
-}
-
-CardModels.defaultProps = {
-  color: "light",
-};
-
-CardModels.propTypes = {
-  color: PropTypes.oneOf(["light", "dark"]),
 };

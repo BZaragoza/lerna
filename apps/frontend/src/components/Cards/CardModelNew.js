@@ -10,7 +10,7 @@ import InputBoxForm from "components/Forms/InputBoxForm";
 
 export default function CardModelNew() {
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
     resolver: yupResolver(modelSchema)
   })
 
@@ -20,6 +20,7 @@ export default function CardModelNew() {
   const isAddMode = !id;
 
   const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true)
 
   const { last_url } = queryString.parse( location.search )
 
@@ -31,6 +32,7 @@ export default function CardModelNew() {
       .then(res => res.json())
       .then(({ res }) => {
         setBrands(res)
+        setLoading(false)
       })
 
   }, [])
@@ -111,12 +113,15 @@ export default function CardModelNew() {
                 >
                   Marcas
                 </label>
-                  <select {...register("marca_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
-                    <option defaultValue={null}></option>
+                  <select defaultValue={ null || getValues("marca_id")} {...register("marca_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                    <option value={null}></option>
                     {
-                      brands.map(({ marca, id }) => {
-                        return <option key={marca} value={id}>{marca}</option>
-                      })
+                      !loading && 
+                      (
+                        brands.map(({ marca, id }) => {
+                          return <option key={marca} value={id}>{marca}</option>
+                        })
+                      )
                     }
                   </select>
                 </div>
@@ -134,7 +139,6 @@ export default function CardModelNew() {
                 register={register}
                 label="Modelo Numerico"
                 input="modelo_num"
-                required
                 large
               />
 

@@ -63,7 +63,7 @@ export const modelSchema = Yup.object().shape({
     
     modelo: Yup.string().required("Modelo es requerido"),
     
-    modelo_num: Yup.string().required("Modelo es requerido")    
+    modelo_num: Yup.string()
 })
 
 export const faultSchema = Yup.object().shape({

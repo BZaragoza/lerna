@@ -31,7 +31,7 @@ const CardOrderNew = () => {
   const { id } = useParams();
   const isAddMode = !id;
 
-  const { last_url } = queryString.parse( location.search )
+  const { last_url } = queryString.parse(location.search)
 
   const defaultValues = {
     receptionDate: DateTime.now().toJSDate(),
@@ -121,9 +121,8 @@ const CardOrderNew = () => {
     data.receptionDate = DateTime.fromJSDate(data.receptionDate).ts
     data.deadlineDate = DateTime.fromJSDate(data.deadlineDate).ts
 
-
     console.log(data)
-    // return createOrder(data)
+
     return isAddMode
       ? createOrder(data)
       : updateOrder(id, data)
@@ -142,8 +141,8 @@ const CardOrderNew = () => {
       .then(res => {
         console.log(res)
         return last_url
-          ? history.push( last_url )
-          : history.push( '/admin/orders')
+          ? history.push(last_url)
+          : history.push('/admin/orders')
       })
   }
 
@@ -160,8 +159,8 @@ const CardOrderNew = () => {
       .then(res => {
         console.log(res)
         return last_url
-          ? history.push( last_url )
-          : history.push( '/admin/orders')
+          ? history.push(last_url)
+          : history.push('/admin/orders')
       })
   }
 
@@ -191,15 +190,15 @@ const CardOrderNew = () => {
     }
   }
 
-  const handleModelsChange = () => {
+  const handleModelsChange = useCallback(() => {
     const modelsFiltered = models.filter(model => model.marca_id === parseInt(marca_id))
     setValue("models", modelsFiltered)
-  }
+  }, [setValue, models, marca_id])
 
-  const handleSolutionsChange = () => {
+  const handleSolutionsChange = useCallback(() => {
     const solutionsFiltered = solutions.filter(solution => solution.falla_id === parseInt(falla_id))
     setValue("solutions", solutionsFiltered)
-  }
+  }, [setValue, solutions, falla_id])
 
   useEffect(() => {
     if (!isAddMode) {
@@ -222,7 +221,7 @@ const CardOrderNew = () => {
   useEffect(() => {
     handleModelsChange()
     handleSolutionsChange()
-  }, [modelo_id, falla_id])
+  }, [modelo_id, falla_id, handleModelsChange, handleSolutionsChange,])
 
   return (
     <div className="">
@@ -356,8 +355,7 @@ const CardOrderNew = () => {
                             //  .filter( (status) => !status.status.toLowerCase().includes('reparar') )
                             .map(({ status, id }) => (
                               <option key={id} value={Number(id)} >{status}</option>
-                            )
-                            )
+                            ))
                         }
                       </select>
                     )
@@ -543,6 +541,7 @@ const CardOrderNew = () => {
                     render={({ field: { onChange, value } }) => {
                       return (
                         <input
+                          disabled
                           onChange={onChange}
                           defaultValue={value}
                           type="tel"
@@ -633,13 +632,16 @@ const CardOrderNew = () => {
                       >
                         <option defaultValue={null}></option>
                         {
-                          getValues("models")?.map(({ id, modelo }) => {
+                          getValues("models")?.map(({ id, modelo, modelo_num }) => {
                             return (<option
                               key={modelo}
                               value={id}
+                              onClick={() => {
+                                setValue("modelo_num", modelo_num)
+                              }}
                             >
                               {
-                                modelo
+                                `${modelo}${modelo_num && ( " (" + modelo_num + ")" )}`
                               }
                             </option>)
                           }
@@ -651,7 +653,7 @@ const CardOrderNew = () => {
                 />
               </div>
 
-              <div className="w-full lg:w-3/12 px-4">
+              {/* <div className="w-full lg:w-3/12 px-4">
                 <label
                   className="block uppercase text-gray-700 text-xs font-bold mb-2"
                   htmlFor="grid-password"
@@ -672,18 +674,17 @@ const CardOrderNew = () => {
                         {
                           getValues("models")?.map(modelo => {
 
-                            // if (modelo.id === modelo_id) {
-                              return (
-                                <option
-                                  
-                                  key={modelo.modelo_num}
-                                  defaultValue={modelo.id}
-                                >
-                                  {
-                                    modelo.modelo_num
-                                  }
-                                </option>
-                              )
+                            return (
+                              <option
+
+                                key={modelo.modelo_num}
+                                defaultValue={getValues("models")?.filter( modelo => modelo.marca_id ===  modelo_id)[0]?.modelo_num}
+                              >
+                                {
+                                  modelo.modelo_num
+                                }
+                              </option>
+                            )
                             // }
                           })
                         }
@@ -691,7 +692,7 @@ const CardOrderNew = () => {
                     )
                   }}
                 />
-              </div>
+              </div> */}
 
               <div className="w-full lg:w-3/12 px-4 mt-2">
                 <div className="relative w-full ">

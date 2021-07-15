@@ -12,7 +12,7 @@ import InputBoxForm from "components/Forms/InputBoxForm";
 
 export default function CardSolutionNew() {
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
     resolver: yupResolver(solutionSchema)
   })
 
@@ -22,8 +22,9 @@ export default function CardSolutionNew() {
   const isAddMode = !id;
 
   const [faults, setFaults] = useState([]);
+  const [loading, setLoading] = useState(true)
 
-  const { last_url } = queryString.parse( location.search )
+  const { last_url } = queryString.parse(location.search)
 
   console.log(errors);
 
@@ -48,8 +49,8 @@ export default function CardSolutionNew() {
       .then(res => {
         console.log(res)
         return last_url
-          ? history.push( last_url )
-          : history.push( '/admin/faults-solutions')
+          ? history.push(last_url)
+          : history.push('/admin/faults-solutions')
       })
 
   }
@@ -67,17 +68,21 @@ export default function CardSolutionNew() {
       .then(res => {
         console.log(res)
         return last_url
-          ? history.push( last_url )
-          : history.push( '/admin/faults-solutions')
+          ? history.push(last_url)
+          : history.push('/admin/faults-solutions')
       })
   }
+
 
 
   useEffect(() => {
 
     fetch("/fallas")
       .then(res => res.json())
-      .then(({ res }) => setFaults(res))
+      .then(({ res }) => {
+        setFaults(res)
+        setLoading(false)
+      })
 
   }, [])
 
@@ -102,7 +107,7 @@ export default function CardSolutionNew() {
           </div>
         </div>
         <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <form onSubmit={ handleSubmit(onSubmit) }>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-wrap mt-6">
 
               <div className="w-full px-4">
@@ -113,12 +118,15 @@ export default function CardSolutionNew() {
                   >
                     Falla
                   </label>
-                  <select defaultValue={null} { ...register("falla_id") } className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
+                  <select defaultValue={ null || getValues("falla_id" )} {...register("falla_id")} className="uppercase px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline w-full ease-linear transition-all duration-150">
                     <option value={null}></option>
                     {
-                      faults.map(({ id, falla }) => {
-                        return <option key={falla} value={parseInt(id)}>{ falla }</option>
-                      })
+                      !loading && 
+                      (
+                        faults.map(({ id, falla }) => {
+                          return <option key={falla} value={parseInt(id)}>{falla}</option>
+                        })
+                      )
                     }
                   </select>
                 </div>

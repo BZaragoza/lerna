@@ -18,7 +18,7 @@ const UserDropdown = () => {
   return (
     <>
       <a
-        className="text-gray-600 block"
+        className="z-0 text-gray-600 block"
         href="#pablo"
         ref={btnDropdownRef}
         onClick={(e) => {
@@ -78,7 +78,7 @@ const UserDropdown = () => {
           }
           onClick={(e) => e.preventDefault()}
         >
-          Seprated link
+          Separated link
         </a>
       </div>
     </>
