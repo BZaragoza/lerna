@@ -44,15 +44,18 @@ export default function(router, pool) {
             errors: errors.array() 
         })
         }
-    
+        
         const { marca } = req.body;
         
         try {       
-            await pool.query(`INSERT INTO marcas (marca) VALUES (?);`, [marca]);
-    
+            await pool.query(`INSERT INTO marcas (marca) VALUES (?);`, [marca?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")]);
+            
+            const createdBrand = await pool.query(`SELECT * from marcas WHERE marca="${req.body.marca?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}";`)
+
             res.json({
                 ok: true,
-                msg: `Marca guardada.`
+                msg: `Marca guardada.`,
+                createdBrand: createdBrand[0]
             });
     
         } catch (err) {
@@ -66,11 +69,10 @@ export default function(router, pool) {
     router.put("/marcas/:id", check('id').isNumeric(), async (req, res) => {
     
         const { id } = req.params;
-        const { marca } = req.body;
-        
+        const { marca } = req.body;       
     
         try {
-            await pool.query(`UPDATE marcas SET marca=? WHERE id=${id}`, [marca]);
+            await pool.query(`UPDATE marcas SET marca=? WHERE id=${id}`, [marca?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")]);
     
             res.json({
                 ok: true,
@@ -99,11 +101,19 @@ export default function(router, pool) {
             });
     
         } catch (err) {
-    
-            res.status(400).json({
-                ok: false,
-                err
-            })
+            if (err.sqlMessage.includes('foreign key constraint fails')) {
+                res.status(200).json({
+                    ok: false,
+                    err: 'Hay modelos dependientes de esta marca'
+                })
+            } else {
+                res.status(200).json({
+                    ok: false,
+                    err
+                })
+            }
+
+            
         }
     
     });

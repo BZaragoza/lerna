@@ -1,7 +1,7 @@
 export function getNextFolio(folio) {
     
     // Get number in the folio
-    let newFolio = parseInt(folio.substring(2,6))
+    let newFolio = parseInt(folio.slice(-4))
 
     // Add 1 to folio, stringify it, fill it with 0's
     // until has size 4, then add "RC" to the beginning

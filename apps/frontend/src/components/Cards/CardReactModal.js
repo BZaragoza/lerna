@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import Modal, { ModalProvider, BaseModalBackground } from "styled-react-modal";
+import React, { useState } from "react";
+import Modal from "styled-react-modal";
 import { DateTime } from 'luxon';
 
 const StyledModal = Modal.styled``;
@@ -228,11 +227,6 @@ function FancyModalButton({ order, showModal, setShowModal }) {
     </div>
   );
 }
-
-const FadingBackground = styled(BaseModalBackground)`
-  opacity: ${(props) => props.opacity};
-  transition: all 0.3s ease-in-out;
-`;
 
 export default function App({ order, showModal, setShowModal }) {
   return (

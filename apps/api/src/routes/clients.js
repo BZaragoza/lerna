@@ -4,7 +4,7 @@ export default function (router, pool) {
 
     router.get("/clientes", async (req, res) => {
         try {
-            const query = await pool.query('SELECT * FROM clientes WHERE activo=1;');
+            const query = await pool.query('SELECT * FROM clientes ORDER BY nombre ASC;');
 
             res.send({
                 ok: true,
@@ -36,7 +36,7 @@ export default function (router, pool) {
 
             // Typical request processing
             const { id } = req.params;
-            const query = await pool.query(`SELECT * FROM clientes WHERE activo=1 AND id=${id};`);
+            const query = await pool.query(`SELECT * FROM clientes WHERE id=${id};`);
 
             res.json({
                 ok: true,
@@ -52,27 +52,31 @@ export default function (router, pool) {
 
     });
 
-    router.post("/clientes", async (req, res) => {  
+    router.post("/clientes", async (req, res) => {
 
         const clientToSave = [
-            req.body.nombre || null, 
-            req.body.apellido_paterno || null, 
-            req.body.apellido_materno || null, 
-            req.body.telefono1 || null, 
-            req.body.telefono2 || null, 
-            req.body.notas || null
+            req.body.nombre?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null,
+            req.body.apellido_paterno?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null,
+            req.body.apellido_materno?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null,
+            req.body.telefono1?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null,
+            req.body.telefono2?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null,
+            req.body.notas?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || null
         ]
 
         const queryString = `INSERT INTO clientes (nombre, apellido_paterno, apellido_materno, telefono1, telefono2, notas) VALUES (?, ?, ?, ?, ?, ?);`
 
         pool.query(queryString, clientToSave)
-            .then( () => {
+            .then(async () => {
+
+                const createdClient = await pool.query(`SELECT * from clientes WHERE nombre="${req.body.nombre}";`)
+
                 res.json({
                     ok: true,
-                    msg: `Cliente ${req.body.nombre} guardado.`
+                    msg: `Cliente ${req.body.nombre} guardado.`,
+                    createdClient: createdClient[0]
                 });
             })
-            .catch( (err) => {
+            .catch(err => {
                 res.status(422).json({
                     ok: false,
                     err
@@ -88,28 +92,36 @@ export default function (router, pool) {
             ON DUPLICATE KEY UPDATE num_telefono = VALUES(num_telefono)
 
         */
-        
+
         const { id } = req.params;
-        const { 
-            nombre, 
-            apellido_paterno, 
-            apellido_materno, 
-            telefono1, 
-            telefono2, 
-            notas  
+        const {
+            nombre,
+            apellido_paterno,
+            apellido_materno,
+            telefono1,
+            telefono2,
+            notas
         } = req.body;
 
         // ACTUALIZAR A ALGO ASÍ COMO: const clientToUpdate = req.body;
         // TENER CUIDADO CON LAS VALIDACIONES
-
         try {
-            const queryString = `UPDATE clientes SET nombre=\"${nombre}\", apellido_paterno=\"${apellido_paterno}\", apellido_materno=${apellido_materno ? "\""+apellido_materno+"\"" : null}, telefono1=${telefono1 ? "\""+telefono1+"\"" : null}, telefono2=${telefono2 ? "\""+telefono2+"\"" : null}, notas=${notas ? "\""+notas+"\"" : null} WHERE id=${id}`;
-            // console.log(queryString)
-            const query = await pool.query(queryString);
-            console.log(query)
+            const queryString = `UPDATE clientes SET 
+                nombre=\"${nombre?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}\", 
+                apellido_paterno=\"${apellido_paterno?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || ''}\",
+                apellido_materno=${apellido_materno ? "\"" + apellido_materno?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "\"" : null},
+                telefono1=${telefono1 ? "\"" + telefono1?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "\"" : null},
+                telefono2=${telefono2 ? "\"" + telefono2?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "\"" : null},
+                notas=${notas ? "\"" + notas?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + "\"" : null} 
+                WHERE id=${id}`;
+
+            await pool.query(queryString);
+            const updatedClient = await pool.query(`SELECT * from clientes WHERE id=${id}`)
+
             res.json({
                 ok: true,
-                msg: 'Cliente actualizado.'
+                msg: 'Cliente actualizado.',
+                updatedClient: updatedClient[0]
             });
 
         } catch (err) {
@@ -125,19 +137,28 @@ export default function (router, pool) {
 
         const { id } = req.params;
 
-        pool.query(`UPDATE clientes SET activo=0 WHERE id=${id}`)
-            .then(() => {
-                res.json({
-                    ok: true,
-                    msg: 'Cliente borrado.'
-                });
-            })
-            .catch(err => {
-                res.status(400).json({
+        try {
+            await pool.query(`DELETE FROM clientes WHERE id=${id}`);
+
+            res.json({
+                ok: true,
+                msg: 'Cliente borrado.'
+            });
+
+        } catch (err) {
+            console.log(err)
+            if (err.sqlMessage.includes('foreign key constraint fails')) {
+                res.status(200).json({
                     ok: false,
-                    err
+                    err: 'Hay modelos dependientes de esta marca'
                 })
-            })
+            } else {
+                res.status(422).json({
+                    ok: false,
+                    err: err.sqlMessage
+                })
+            }
+        }
 
     });
 }

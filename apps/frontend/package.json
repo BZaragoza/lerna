@@ -29,6 +29,7 @@
     "react-dom": "16.13.1",
     "react-google-maps": "9.4.5",
     "react-hook-form": "^7.0.4",
+    "react-minimal-side-navigation": "^1.9.2",
     "react-modal": "^3.14.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
@@ -42,7 +43,7 @@
     "yup": "^0.32.9"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3006 react-scripts start",
     "build": "react-scripts build && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

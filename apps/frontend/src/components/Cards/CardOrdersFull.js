@@ -52,6 +52,7 @@ export default function CardOrdersFull({ color }) {
         color = order.color
         id = order.id
       }
+      return null
     })
 
     return [color, id] 
@@ -77,7 +78,7 @@ export default function CardOrdersFull({ color }) {
 
           return <div onClick={ e => e.stopPropagation() }>
           <NotificationDropdown fetchOrders={fetchOrders} orderId={id} >
-            <span className={color + " text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"} >
+            <span style={{ backgroundColor: color }} className={" text-xs font-semibold inline-block py-1 px-2 uppercase rounded uppercase last:mr-0 mr-1"} >
               {props.cell.value}
             </span>
           </NotificationDropdown>
@@ -195,7 +196,7 @@ export default function CardOrdersFull({ color }) {
         col4: `${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase(),
         col5: telefono1,
         col6: telefono2,
-        col7: device.toUpperCase(),
+        col7: device?.toUpperCase() || "",
         col8: `${marca} ${modelo} ( ${modelo_num} )`.toUpperCase(),
         col9: dejo ? "SI" : "NO",
         col10: `${falla}`.toUpperCase(),

@@ -49,11 +49,14 @@ export default function(router, pool) {
         const { compañia } = req.body;
         
         try {       
-            await pool.query(`INSERT INTO chip (compañia) VALUES (?);`, [compañia]);
+            await pool.query(`INSERT INTO chip (compañia) VALUES (?);`, [compañia.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")]);
+
+            const createdSim = await pool.query(`SELECT * from chip WHERE compañia="${req.body.compañia.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}";`)
     
             res.json({
                 ok: true,
-                msg: `Compañia guardado.`
+                msg: `Compañia guardada.`,
+                createdSim: createdSim[0]
             });
     
         } catch (err) {
@@ -70,7 +73,7 @@ export default function(router, pool) {
         const { compañia } = req.body;
     
         try {
-            await pool.query(`UPDATE chip SET ? WHERE id=${id}`, {compañia});
+            await pool.query(`UPDATE chip SET ? WHERE id=${id}`, {compañia: compañia.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")});
     
             res.json({
                 ok: true,

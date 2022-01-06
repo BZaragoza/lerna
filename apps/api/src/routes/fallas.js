@@ -4,7 +4,7 @@ export default function (router, pool) {
 
     router.get("/fallas", async (req, res) => {
 
-        const query = await pool.query('SELECT * FROM fallas');
+        const query = await pool.query('SELECT * FROM fallas ORDER BY falla;');
 
         res.send({
             ok: true,
@@ -55,11 +55,18 @@ export default function (router, pool) {
             const { falla, descripcion } = req.body;
 
             try {
-                await pool.query(`INSERT INTO fallas (falla, descripcion) VALUES (?, ?);`, [falla, descripcion]);
+                await pool.query(`INSERT INTO fallas (falla, descripcion) VALUES (?, ?);`, 
+                    [
+                        falla.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), 
+                        descripcion.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+                    ]);
+
+                const createdFailure = await pool.query(`SELECT * FROM fallas WHERE falla=${req.body.falla ? "\"" + req.body.falla + "\"" : null};`)
 
                 res.json({
                     ok: true,
-                    msg: `Falla registrada.`
+                    msg: `Falla registrada.`,
+                    createdFailure: createdFailure[0]
                 });
 
             } catch (err) {
@@ -75,17 +82,17 @@ export default function (router, pool) {
 
         const { id } = req.params;
         const { falla, descripcion } = req.body;
-        const clientToUpdate = {
-            falla,
-            descripcion
+        const failToUpdate = {
+            falla: falla.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+            descripcion: descripcion.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         }
 
         try {
-            await pool.query(`UPDATE fallas SET ? WHERE id=${id}`, clientToUpdate);
+            await pool.query(`UPDATE fallas SET ? WHERE id=${id}`, failToUpdate);
 
             res.json({
                 ok: true,
-                msg: 'Cliente actualizado.'
+                msg: 'Cliente actualizado.',
             });
 
         } catch (err) {
@@ -103,7 +110,8 @@ export default function (router, pool) {
         const { id } = req.params;
 
         try {
-            await pool.query(`DELETE FROM fallas WHERE id=${id}`);
+            const resp = await pool.query(`DELETE FROM fallas WHERE id=${id}`);
+
 
             res.json({
                 ok: true,

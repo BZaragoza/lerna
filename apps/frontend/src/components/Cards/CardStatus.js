@@ -35,8 +35,12 @@ function CardStatus(  color='light' ) {
         accessor: 'col2',
       },
       {
-        Header: 'Editar',
+        Header: 'Ordenes de Servicio',
         accessor: 'col3',
+      },
+      {
+        Header: 'Editar',
+        accessor: 'col4',
       },
     ],
     []
@@ -47,7 +51,8 @@ function CardStatus(  color='light' ) {
       statuses.map(status => ({
         col1: status.status,
         col2: <div className={status.color} style={{ border: '1px solid #aaa', width: '50px', height: '20px', }}></div>,
-        col3: <CardEditDeleteDropdown
+        col3: status.count,
+        col4: <CardEditDeleteDropdown
           path={`/admin/status-new/${status.id}?last_url=${location.pathname}`}
           id={status.id}
           table="status"

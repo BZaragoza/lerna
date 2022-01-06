@@ -3,8 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { DateTime } from 'luxon';
 
 import CardOrdersDropdown from "components/Dropdowns/CardOrdersDropdown.js";
-import NotificationDropdown from 'components/Dropdowns/NotificationDropdown'
-import CardModal from "components/Cards/CardModal.js";
+import NotificationDropdown from 'components/Dropdowns/NotificationDropdown';
 import OrderTable from "components/Table/OrderTable"
 
 import CardReactModal from "components/Cards/CardReactModal"
@@ -48,6 +47,7 @@ export default function CardOrdersLite({ color = "light" }) {
         color = order.color
         id = order.id
       }
+      return null
     })
 
     return [color, id]
@@ -133,7 +133,7 @@ export default function CardOrdersLite({ color = "light" }) {
         col2: folio,
         col3: status,
         col4: `${nombre} ${apellido_paterno} ${apellido_materno || ""}`.toUpperCase(),
-        col5: device.toUpperCase(),
+        col5: device?.toUpperCase(),
         col6: `${falla}`.toUpperCase(),
         col7: `$ ${price}`,
         col8: DateTime.fromMillis(deadlineDate).toLocaleString(DateTime.DATETIME_MED),
@@ -164,7 +164,6 @@ export default function CardOrdersLite({ color = "light" }) {
       <OrderTable
         techColumn='col9'
         statusColumn='col3'
-        orders={orders}
         columns={columns}
         data={data}
         orders={orders}

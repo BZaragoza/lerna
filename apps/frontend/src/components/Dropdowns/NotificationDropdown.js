@@ -81,7 +81,7 @@ const CardDropdown = ({ fetchOrders, orderId, children }) => {
                 doSomething(id)
               }}
             >
-              <div className={color + "p-2 mb-1"}>
+              <div style={{backgroundColor: color}} className={"p-2 mb-1"}>
                 {status}
               </div>
             </div>

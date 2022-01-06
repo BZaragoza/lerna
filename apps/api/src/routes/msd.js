@@ -48,11 +48,14 @@ export default function(router, pool) {
         const { capacidad } = req.body;
         
         try {       
-            await pool.query(`INSERT INTO msd (capacidad) VALUES (?);`, [capacidad]);
+            await pool.query(`INSERT INTO msd (capacidad) VALUES (?);`, [capacidad.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")]);
+
+            const createdMsd = await pool.query(`SELECT * from msd WHERE capacidad="${req.body.capacidad.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}";`)
     
             res.json({
                 ok: true,
-                msg: `MSD guardada.`
+                msg: `MSD guardada.`,
+                createdMsd: createdMsd[0]
             });
     
         } catch (err) {
